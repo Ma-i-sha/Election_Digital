@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 400px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        label {
+            margin-top: 10px;
+            display: block;
+            font-weight: bold;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .register-link {
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+
+    <div class="container">
+        <h2>Voter Login</h2>
+        <form onsubmit="login(event)">
+            <label for="nid_no">NID No</label>
+            <input type="text" id="nid_no" name="nid_no" required>
+
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+
+
+            <button type="submit" class="btn">Login</button>
+
+
+            <div class="register-link">
+                <p>Don't have an account? <a href="register.html">Register here</a></p>
+            </div>
+        </form>
+    </div>
+
+
+    <script>
+        function login(event) {
+            event.preventDefault();
+
+
+            const nid_no = document.getElementById('nid_no').value;
+            const password = document.getElementById('password').value;
+
+
+            if (!nid_no || !password) {
+                alert('Please fill in both fields.');
+                return;
+            }
+
+
+            const user = { nid_no, password };
+
+
+            fetch('http://localhost:3000/user_check', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json, text/plain, */*',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.message === "Login successful") {
+                    window.localStorage.setItem('user', JSON.stringify(res.user));
+                    window.location.href = './user_home.html';
+                } else {
+                    alert(res.error || 'Unknown error occurred.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while processing your request.');
+            });
+        }
+    </script>
+
+
+</body>
+</html>
+
+
+

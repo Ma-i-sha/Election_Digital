@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter Registration</title>
+    <style>
+       
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 400px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        input[type="text"], input[type="password"], input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Voter Registration</h2>
+        <form id="registrationForm">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" required>
+
+
+            <label for="father_name">Father's Name</label>
+            <input type="text" id="father_name" name="father_name" required>
+
+
+            <label for="mother_name">Mother's Name</label>
+            <input type="text" id="mother_name" name="mother_name" required>
+
+
+            <label for="nid_no">National ID Number</label>
+            <input type="text" id="nid_no" name="nid_no" required>
+
+
+            <label for="dob">Date of Birth</label>
+            <input type="date" id="dob" name="dob" required>
+
+
+            <label for="blood_group">Blood Group</label>
+            <input type="text" id="blood_group" name="blood_group" required>
+
+
+            <label for="home">Home No</label>
+            <input type="text" id="home" name="home" required>
+
+
+            <label for="road">Road No</label>
+            <input type="text" id="road" name="road" required>
+
+
+            <label for="post_office">Post Office</label>
+            <input type="text" id="post_office" name="post_office" required>
+
+
+            <label for="postal_code">Postal Code</label>
+            <input type="text" id="postal_code" name="postal_code" required>
+
+
+            <label for="city">City</label>
+            <input type="text" id="city" name="city" required>
+
+
+            <label for="country">Country</label>
+            <input type="text" id="country" name="country" required>
+
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+
+
+            <label for="retype_password">Retype Password</label>
+            <input type="password" id="retype_password" name="retype_password" required>
+
+
+            <button type="submit" class="btn">Register</button>
+        </form>
+    </div>
+
+
+    <script>
+        document.getElementById('registrationForm').addEventListener('submit', function(event) {
+            event.preventDefault();  // Prevent the form from submitting normally
+
+
+            const user = {
+                name: event.target.name.value,
+                father_name: event.target.father_name.value,
+                mother_name: event.target.mother_name.value,
+                nid_no: event.target.nid_no.value,
+                dob: event.target.dob.value,
+                blood_group: event.target.blood_group.value,
+                home: event.target.home.value,
+                road: event.target.road.value,
+                post_office: event.target.post_office.value,
+                postal_code: event.target.postal_code.value,
+                city: event.target.city.value,
+                country: event.target.country.value,
+                password: event.target.password.value
+            };
+
+
+            // Send data to the backend 
+            fetch('http://localhost:3000/add_voter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                } else {
+                    alert('Registration failed: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
