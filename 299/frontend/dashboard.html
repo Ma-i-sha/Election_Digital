@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(to right, #ff4e50, #f9d423);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 90%;  /* Adjust to make it more responsive */
+            max-width: 1000px;
+            margin: 20px;
+        }
+
+        .header {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #fff;
+            font-size: 36px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            background-color: #008000;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-pic {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-pic img {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 5px solid #008000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .info-box {
+            background-color: #f0f9f5;
+            padding: 20px;
+            border-radius: 10px;
+            width: 100%;  /* Adjusted width for better fit */
+            max-width: 500px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            margin-bottom: 20px;
+        }
+
+        .info-header {
+            background-color: #d12d2d;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .info-header h2 {
+            color: white;
+            font-size: 20px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .info-content {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .info-content p {
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .info-content p strong {
+            font-weight: bold;
+            color: #d12d2d;
+        }
+
+        .info-content p span {
+            font-weight: normal;
+            color: #333;
+        }
+
+        /* Hover effect for the picture */
+        .profile-pic img:hover {
+            transform: scale(1.05);
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Extra Hover and Box Effects */
+        .info-box:hover {
+            background-color: #e6fff5;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease-in-out;
+        }
+        
+        /* Button for styling options */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #008000;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .btn:hover {
+            background-color: #005700;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .profile-pic img {
+                width: 150px;
+                height: 150px;
+            }
+
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .info-box {
+                width: 90%;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Voter Profile</h1>
+        </div>
+
+        <div class="profile-pic">
+            <img src="profile-pic.jpg" alt="Profile Picture">
+        </div>
+
+        <div class="info-box">
+            <div class="info-header">
+                <h2>Information</h2>
+            </div>
+            <div class="info-content">
+                <p><strong>NAME:</strong> <span>Effat Haque</span></p>
+                <p><strong>ID:</strong> <span>123456789</span></p>
+                <p><strong>FATHER NAME:</strong> <span>Mr. Ramim</span></p>
+                <p><strong>MOTHER NAME:</strong> <span>Mrs. Ramia</span></p>
+                <p><strong>NID NO:</strong> <span>987654321</span></p>
+                <p><strong>DOB:</strong> <span>01/01/2001</span></p>
+                <p><strong>BLOOD GROUP:</strong> <span>B+</span></p>
+                <p><strong>HOME:</strong> <span>123 Main St</span></p>
+                <p><strong>ROAD:</strong> <span>Street 2</span></p>
+                <p><strong>POST OFFICE:</strong> <span>City feni</span></p>
+                <p><strong>POSTAL CODE:</strong> <span>1769</span></p>
+                <p><strong>CITY:</strong> <span>Chittagong</span></p>
+                <p><strong>COUNTRY:</strong> <span>Bangladesh</span></p>
+                <p><strong>PASSWORD:</strong> <span>*******</span></p>
+                <p><strong>CREATED AT:</strong> <span>01/01/2024</span></p>
+            </div>
+
+            <div class="btn">Update Profile</div>
+        </div>
+    </div>
+
+
+    <script>
+        document.querySelector('.btn').addEventListener('click', function () {
+        // Collect the user input from the form (you need to have corresponding inputs in the form)
+        const formData = new FormData();
+
+        // Assuming the user has filled out a form for updating profile details
+        formData.append('fname', document.getElementById('fname').value);
+        formData.append('lname', document.getElementById('lname').value);
+        formData.append('gender', document.getElementById('gender').value);
+        formData.append('dob', document.getElementById('dob').value);
+        formData.append('password', document.getElementById('password').value);
+        formData.append('father_name', document.getElementById('father_name').value);
+        formData.append('mother_name', document.getElementById('mother_name').value);
+        formData.append('nid', document.getElementById('nid_no').value);
+        formData.append('blood_group', document.getElementById('blood_group').value);
+        formData.append('home', document.getElementById('home').value);
+        formData.append('road', document.getElementById('road').value);
+        formData.append('post_office', document.getElementById('post_office').value);
+        formData.append('postal_code', document.getElementById('postal_code').value);
+        formData.append('city', document.getElementById('city').value);
+        formData.append('country', document.getElementById('country').value);
+        formData.append('email', loggedInUser.email);  // Make sure `loggedInUser.email` is the actual user's email
+        
+        // If the user updated the profile picture
+        const profilePic = document.getElementById('profile_picture').files[0];
+        if (profilePic) {
+            formData.append('profile_picture', profilePic);  // Only append if there is a new file
+        }
+
+        fetch('http://localhost:3000/update_user', {
+            method: 'POST',
+            body: formData  // We are sending the form data with the profile picture and other fields
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Profile updated successfully');
+                // Optionally, you can reload the page or update the UI with the new profile info
+                location.reload();
+            } else {
+                alert('There was an issue updating the profile');
+            }
+        })
+        .catch(error => console.error('Error updating profile:', error));
+    });
+        // Assuming 'loggedInUser' is an object available with the user's email or other identifier
+        const loggedInUser = {
+            email: "user@example.com"  // Replace this with the actual user email
+        };
+
+        fetch('http://localhost:3000/home_page', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: loggedInUser.email })
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log(data);
+            const userData = data.result[0];
+            const dob = new Date(userData.dob);
+            const formattedDob = dob.toDateString();
+
+            // Update HTML elements with the fetched data
+            document.getElementById("first_name").textContent = userData.fname + ' ' + userData.lname;
+            document.getElementById("id_no").textContent = userData.id;
+            document.getElementById("father_name").textContent = userData.father_name;
+            document.getElementById("mother_name").textContent = userData.mother_name;
+            document.getElementById("nid_no").textContent = userData.nid;
+            document.getElementById("dob").textContent = formattedDob;
+            document.getElementById("blood_group").textContent = userData.blood_group;
+            document.getElementById("home").textContent = userData.home;
+            document.getElementById("road").textContent = userData.road;
+            document.getElementById("post_office").textContent = userData.post_office;
+            document.getElementById("postal_code").textContent = userData.postal_code;
+            document.getElementById("city").textContent = userData.city;
+            document.getElementById("country").textContent = userData.country;
+            document.getElementById("password").textContent = '*******';  // Mask password
+            document.getElementById("created_at").textContent = new Date(userData.created_at).toLocaleDateString();
+
+            // Update the profile picture
+            if (userData.profile_picture && userData.profile_picture.startsWith('data:image')) {
+                document.getElementById("currentProfilePicture").src = userData.profile_picture;
+            } else if (userData.profile_picture) {
+                document.getElementById("currentProfilePicture").src = `http://localhost:3000/image/${userData.profile_picture}`;
+            }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    </script>
+
+</body>
+</html>
+
