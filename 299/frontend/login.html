@@ -6,8 +6,8 @@
     <title>Voter Login</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eceff1;
             margin: 0;
             padding: 0;
         }
@@ -15,61 +15,116 @@
             width: 400px;
             margin: 50px auto;
             background-color: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            transition: all 0.3s ease-in-out;
+        }
+        .container:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
         h2 {
             text-align: center;
+            color: #333;
+            font-size: 24px;
             margin-bottom: 20px;
+            font-weight: 600;
+            letter-spacing: 1px;
         }
-        input[type="text"], input[type="password"] {
+        input[type="text"], input[type="password"], input[type="tel"], select {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 10px 0;
             border: 1px solid #ccc;
-            border-radius: 5px;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.2s ease;
+        }
+        input:focus, select:focus {
+            border-color: #4CAF50;
+            outline: none;
         }
         label {
             margin-top: 10px;
             display: block;
             font-weight: bold;
+            color: #555;
         }
         .btn {
             background-color: #4CAF50;
             color: white;
-            padding: 10px;
+            padding: 12px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             width: 100%;
-            font-size: 16px;
+            font-size: 18px;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
         }
         .btn:hover {
             background-color: #45a049;
         }
         .register-link {
             text-align: center;
-            margin-top: 10px;
+            margin-top: 15px;
+        }
+        .register-link a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        .register-link a:hover {
+            color: #388E3C;
+        }
+        .loader {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border: 4px solid #f3f3f3; /* Light grey */
+            border-top: 4px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-
-
+    <div class="loader"></div>
     <div class="container">
         <h2>Voter Login</h2>
         <form onsubmit="login(event)">
             <label for="nid_no">NID No</label>
             <input type="text" id="nid_no" name="nid_no" required>
 
+            <label for="phone_number">Phone Number</label>
+            <input type="text" id="phone_number" name="phone_number" required pattern="\d{11}" maxlength="11" title="Must be exactly 11 digits">
+
+            <label for="city">City</label>
+            <select id="city" name="city" required>
+                <option value="">Select City</option>
+                <option value="Barishal">Barishal</option>
+                <option value="Chattogram">Chattogram</option>
+                <option value="Dhaka">Dhaka</option>
+                <option value="Khulna">Khulna</option>
+                <option value="Rajshahi">Rajshahi</option>
+                <option value="Rangpur">Rangpur</option>
+                <option value="Mymensingh">Mymensingh</option>
+                <option value="Sylhet">Sylhet</option>
+            </select>
 
             <label for="password">Password</label>
             <input type="password" id="password" name="password" required>
 
-
             <button type="submit" class="btn">Login</button>
-
 
             <div class="register-link">
                 <p>Don't have an account? <a href="register.html">Register here</a></p>
@@ -77,25 +132,28 @@
         </form>
     </div>
 
-
     <script>
         function login(event) {
-            event.preventDefault();
+            event.preventDefault();  // Prevent form submission
 
+            const nid_no = document.getElementById('nid_no').value.trim();
+            const phone_number = document.getElementById('phone_number').value.trim();
+            const city = document.getElementById('city').value;
+            const password = document.getElementById('password').value.trim();
 
-            const nid_no = document.getElementById('nid_no').value;
-            const password = document.getElementById('password').value;
+            const loader = document.querySelector('.loader');
+            loader.style.display = 'block';  // Show loader
 
-
-            if (!nid_no || !password) {
-                alert('Please fill in both fields.');
+            // Validate form inputs
+            if (!nid_no || !phone_number || !city || !password) {
+                alert('Please fill in all fields.');
+                loader.style.display = 'none';  // Hide loader on error
                 return;
             }
 
+            const user = { nid_no, phone_number, city, password };
 
-            const user = { nid_no, password };
-
-
+            // Send user credentials to the server
             fetch('http://localhost:3000/user_check', {
                 method: 'POST',
                 headers: {
@@ -106,23 +164,25 @@
             })
             .then(res => res.json())
             .then(res => {
+                loader.style.display = 'none';  // Hide loader on success/failure
                 if (res.message === "Login successful") {
+                    // Save user data to localStorage
+                    window.localStorage.setItem('nid_no', nid_no);
                     window.localStorage.setItem('user', JSON.stringify(res.user));
-                    window.location.href = './user_home.html';
+
+                    // Redirect to the dashboard
+                    window.location.href = './dashboard.html';
                 } else {
                     alert(res.error || 'Unknown error occurred.');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
+                loader.style.display = 'none';  // Hide loader on error
                 alert('An error occurred while processing your request.');
             });
         }
     </script>
 
-
 </body>
 </html>
-
-
-
