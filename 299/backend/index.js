@@ -8,6 +8,7 @@
 // to open node post-end-point.js or nodemon index.js
 
 
+const fs = require('fs');
 
 const express = require('express');
 const mysql = require('mysql');
@@ -21,15 +22,21 @@ const app = express();
 const port = 3000;
 
 // Configure multer for profile picture upload
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // Specify upload directory
+    cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); // Rename file to avoid conflicts
+    cb(null, Date.now() + path.extname(file.originalname));
   }
 });
-const upload = multer({ storage: storage, limits: { fileSize: 1024 * 1024 * 5 } }); // Limit file size to 5MB
+const upload = multer({ storage: storage });
+
 
 // Database connection setup
 const db = mysql.createConnection({
@@ -171,6 +178,7 @@ app.post('/update_user', upload.single('profile_picture'), async (req, res) => {
         father_name, 
         mother_name, 
         nid_no, 
+        phone_number,
         dob, 
         blood_group, 
         home, 
@@ -188,11 +196,11 @@ app.post('/update_user', upload.single('profile_picture'), async (req, res) => {
 
     let query = `
         UPDATE voter SET fname = ?, father_name = ?, mother_name = ?, dob = ?, 
-        blood_group = ?, home = ?, road = ?, post_office = ?, postal_code = ?, 
+        blood_group = ?,phone_number = ?, home = ?, road = ?, post_office = ?, postal_code = ?, 
         city = ?, country = ? ${profilePicturePath ? ', profile_picture = ?' : ''} 
     `;
 
-    const values = [fname, father_name, mother_name, dob, blood_group, home, road, post_office, postal_code, city, country];
+    const values = [fname, father_name, mother_name, dob, blood_group,phone_number, home, road, post_office, postal_code, city, country];
 
     // Hash new password if provided
     if (new_password) {
@@ -232,7 +240,7 @@ app.post('/home_page/nid', (req, res) => {
   const { nid_no } = req.body;
   console.log(`Received NID: ${nid_no}`);
 
-  const query = `SELECT fname, lname, nid_no, id, father_name, mother_name, dob, blood_group, 
+  const query = `SELECT fname, lname, nid_no, phone_number, id, father_name, mother_name, dob, blood_group, 
                  home, road, post_office, postal_code, city, country, profile_picture 
                  FROM voter WHERE nid_no = ?`;
 
@@ -265,6 +273,7 @@ app.post('/home_page/nid', (req, res) => {
           postal_code: result[0].postal_code,
           city: result[0].city,
           country: result[0].country,
+          phone_number: result[0].phone_number,
           profile_picture: result[0].profile_picture,
           password: '********' // Show password as asterisks
       };
@@ -275,31 +284,38 @@ app.post('/home_page/nid', (req, res) => {
 
 // Delete user profile
 app.post('/delete_user', (req, res) => {
-    const { nid_no } = req.body;
+  const { nid_no } = req.body;
 
-    // Get user data to delete profile picture from the server
-    db.query('SELECT profile_picture FROM voter WHERE nid_no = ?', [nid_no], (err, result) => {
-        if (err) return res.status(500).json({ error: 'Database query error' });
-        if (result.length === 0) return res.status(404).json({ error: 'User not found' });
+  // Get user data to delete profile picture from the server
+  db.query('SELECT profile_picture FROM voter WHERE nid_no = ?', [nid_no], (err, result) => {
+      if (err) {
+          return res.status(500).json({ error: 'Database query error' });
+      }
+      if (result.length === 0) {
+          return res.status(404).json({ error: 'User not found' });
+      }
 
-        const profilePicture = result[0].profile_picture;
+      const profilePicture = result[0].profile_picture;
 
-        // Delete user from database
-        db.query('DELETE FROM voter WHERE nid_no = ?', [nid_no], (err, result) => {
-            if (err) return res.status(500).json({ error: 'Database delete error' });
+      // Delete user from database
+      db.query('DELETE FROM voter WHERE nid_no = ?', [nid_no], (err, result) => {
+          if (err) {
+              return res.status(500).json({ error: 'Database delete error' });
+          }
 
-            // Delete profile picture from server if it exists
-            if (profilePicture && fs.existsSync(`uploads/${profilePicture}`)) {
-                fs.unlink(`uploads/${profilePicture}`, err => {
-                    if (err) console.error('Error deleting profile picture:', err);
-                });
-            }
+          // Delete profile picture from server if it exists
+          if (profilePicture && fs.existsSync(`uploads/${profilePicture}`)) {
+              fs.unlink(`uploads/${profilePicture}`, (err) => {
+                  if (err) {
+                      console.error('Error deleting profile picture:', err);
+                  }
+              });
+          }
 
-            return res.json({ success: true });
-        });
-    });
+          return res.json({ success: true });
+      });
+  });
 });
-
 
 // Start the server
 app.listen(port, () => {
