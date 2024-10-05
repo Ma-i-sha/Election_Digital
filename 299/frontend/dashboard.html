@@ -184,7 +184,8 @@
         </div>
 
         <div class="profile-pic">
-            <img id="currentProfilePicture" src="profile-pic.jpg" alt="Profile Picture">
+            <img id="currentProfilePicture" src="" alt="Profile Picture" style="width:150px; height:150px; border-radius:50%;" />
+
         </div>
 
         <div class="info-box">
@@ -306,6 +307,7 @@
             if (data.result) {
                 const userData = data.result;
 
+                // Set form values
                 document.getElementById('fname').value = userData.fname || '';
                 document.getElementById('lname').value = userData.lname || '';
                 document.getElementById('id_no').value = userData.id_no || '';
@@ -322,17 +324,17 @@
                 document.getElementById('city').value = userData.city || '';
                 document.getElementById('country').value = userData.country || '';
 
-                // Set the profile picture based on the data format
+                // Set the profile picture
                 const profilePictureElement = document.getElementById("currentProfilePicture");
-                if (userData.profile_picture && userData.profile_picture.startsWith('data:image')) {
-                    profilePictureElement.src = userData.profile_picture; // Base64 image
-                } else if (userData.profile_picture) { 
-                    profilePictureElement.src = `http://localhost:3000/image/${userData.profile_picture}`; // URL image
+                if (userData.profile_picture) {
+                    // If profile picture exists, update the img src
+                    profilePictureElement.src = `http://localhost:3000/${userData.profile_picture}`;
                 } else {
-                    profilePictureElement.src = ''; // Set a default image or empty if no picture
+                    // Provide a default image in case no profile picture exists
+                    profilePictureElement.src = '/path/to/default/image.jpg';  // Replace with an actual path to a default image
                 }
 
-                // Note: Remove this line if you don't want to show the password
+                // Optionally show password (mask as asterisks)
                 document.getElementById('password').value = userData.password || ''; 
             } else {
                 console.error('No user data found for this NID.');
@@ -347,6 +349,7 @@
         alert('NID not found in localStorage.');
     }
 };
+
 
         // Update user data
         updateButton.addEventListener('click', () => {
