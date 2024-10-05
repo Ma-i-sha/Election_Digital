@@ -5,170 +5,173 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voter Profile</title>
     <style>
-        * {
+        /* EXISTING CSS STYLES */
+        body {
+            font-family: 'Helvetica Neue', sans-serif;
+            background-color: #e6e6e6;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(to right, #ff4e50, #f9d423);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow-x: hidden;
         }
 
         .container {
+            width: 80%;
+            max-width: 1200px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: all 0.3s ease-in-out;
             display: flex;
             flex-wrap: wrap;
-            justify-content: space-around;
-            background-color: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            width: 90%;  /* Adjust to make it more responsive */
-            max-width: 1000px;
-            margin: 20px;
+        }
+
+        .container:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
         }
 
         .header {
-            width: 100%;
             text-align: center;
-            margin-bottom: 20px;
+            width: 100%;
+            padding: 10px 0;
+            font-size: 2.5em;
+            color: #333;
+            letter-spacing: 1px;
         }
 
-        .header h1 {
-            color: #fff;
-            font-size: 36px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            background-color: #008000;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        .profile-container {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100%;
         }
 
         .profile-pic {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 20px;
+            text-align: center;
+            flex: 1;
+            max-width: 200px;
+            margin-right: 30px;
         }
 
         .profile-pic img {
-            width: 200px;
-            height: 200px;
+            width: 160px;
+            height: 160px;
             border-radius: 50%;
-            border: 5px solid #008000;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            object-fit: cover;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .info-box {
-            background-color: #f0f9f5;
-            padding: 20px;
+            flex: 3;
+            padding: 30px;
+            background-color: #fafafa;
+            border: 1px solid #ccc;
             border-radius: 10px;
-            width: 100%;  /* Adjusted width for better fit */
-            max-width: 500px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-            margin-bottom: 20px;
+            margin-top: auto;
+            margin-bottom: auto;
         }
 
         .info-header {
-            background-color: #d12d2d;
-            padding: 10px;
-            border-radius: 5px;
             margin-bottom: 20px;
         }
 
         .info-header h2 {
-            color: white;
-            font-size: 20px;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            color: #4CAF50;
         }
 
-        .info-content {
-            font-size: 16px;
-            line-height: 1.8;
-            color: #333;
-        }
-
-        .info-content p {
+        .info-content label {
+            display: block;
             margin: 10px 0;
+            font-size: 1.1em;
+            font-weight: bold; /* Makes label text bold */
+            text-transform: uppercase; /* Makes label text uppercase */
+        }
+
+        .info-content strong {
+            margin-right: 10px;
+        }
+
+        input[type="text"], input[type="date"], input[type="password"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        input[disabled] {
+            background-color: #f9f9f9;
+        }
+
+        .btn-container {
             display: flex;
             justify-content: space-between;
+            margin-top: 25px;
         }
 
-        .info-content p strong {
-            font-weight: bold;
-            color: #d12d2d;
-        }
-
-        .info-content p span {
-            font-weight: normal;
-            color: #333;
-        }
-
-        /* Hover effect for the picture */
-        .profile-pic img:hover {
-            transform: scale(1.05);
-            transition: all 0.3s ease-in-out;
-        }
-
-        /* Extra Hover and Box Effects */
-        .info-box:hover {
-            background-color: #e6fff5;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease-in-out;
-        }
-        
-        /* Button for styling options */
         .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #008000;
+            padding: 12px 25px;
+            background-color: #4CAF50;
             color: white;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 5px;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
-            text-align: center;
-            margin-top: 15px;
+            font-size: 1em;
+            transition: background-color 0.3s;
         }
 
         .btn:hover {
-            background-color: #005700;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            transition: background-color 0.3s ease-in-out;
+            background-color: #45a049;
         }
 
-        /* Responsive adjustments */
+        .btn.cancel {
+            background-color: #f44336;
+        }
+
+        .btn.cancel:hover {
+            background-color: #e53935;
+        }
+
+        .btn.delete {
+            background-color: #FF5722;
+        }
+
+        .btn.delete:hover {
+            background-color: #f4511e;
+        }
+
+        .btn.update:disabled, .btn.delete:disabled, .btn.cancel:disabled {
+            background-color: grey;
+            cursor: not-allowed;
+        }
+
         @media (max-width: 768px) {
             .container {
+                padding: 20px;
+            }
+
+            .profile-pic {
+                margin-right: 0;
+                margin-bottom: 20px;
+                max-width: 100%;
+            }
+
+            .profile-container {
                 flex-direction: column;
                 align-items: center;
             }
 
-            .profile-pic img {
-                width: 150px;
-                height: 150px;
-            }
-
-            .header h1 {
-                font-size: 28px;
-            }
-
             .info-box {
-                width: 90%;
-            }
-
-            .btn {
                 width: 100%;
+                padding: 20px;
             }
         }
     </style>
@@ -181,128 +184,241 @@
         </div>
 
         <div class="profile-pic">
-            <img src="profile-pic.jpg" alt="Profile Picture">
+            <img id="currentProfilePicture" src="profile-pic.jpg" alt="Profile Picture">
         </div>
 
         <div class="info-box">
             <div class="info-header">
                 <h2>Information</h2>
             </div>
-            <div class="info-content">
-                <p><strong>NAME:</strong> <span>Effat Haque</span></p>
-                <p><strong>ID:</strong> <span>123456789</span></p>
-                <p><strong>FATHER NAME:</strong> <span>Mr. Ramim</span></p>
-                <p><strong>MOTHER NAME:</strong> <span>Mrs. Ramia</span></p>
-                <p><strong>NID NO:</strong> <span>987654321</span></p>
-                <p><strong>DOB:</strong> <span>01/01/2001</span></p>
-                <p><strong>BLOOD GROUP:</strong> <span>B+</span></p>
-                <p><strong>HOME:</strong> <span>123 Main St</span></p>
-                <p><strong>ROAD:</strong> <span>Street 2</span></p>
-                <p><strong>POST OFFICE:</strong> <span>City feni</span></p>
-                <p><strong>POSTAL CODE:</strong> <span>1769</span></p>
-                <p><strong>CITY:</strong> <span>Chittagong</span></p>
-                <p><strong>COUNTRY:</strong> <span>Bangladesh</span></p>
-                <p><strong>PASSWORD:</strong> <span>*******</span></p>
-                <p><strong>CREATED AT:</strong> <span>01/01/2024</span></p>
-            </div>
 
-            <div class="btn">Update Profile</div>
+            <div class="info-content">
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>PROFILE PICTURE:</strong> <input type="file" id="profile_picture">
+                </label>
+            
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>FIRST NAME:</strong> <input type="text" id="fname" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>LAST NAME:</strong> <input type="text" id="lname" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>ID:</strong> <input type="text" id="id_no" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>FATHER NAME:</strong> <input type="text" id="father_name" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>MOTHER NAME:</strong> <input type="text" id="mother_name" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>NID NO:</strong> <input type="text" id="nid_no" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>DOB:</strong> <input type="date" id="dob" disabled>
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>BLOOD GROUP:</strong> <input type="text" id="blood_group" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>HOME:</strong> <input type="text" id="home" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>ROAD:</strong> <input type="text" id="road" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>POST OFFICE:</strong> <input type="text" id="post_office" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>POSTAL CODE:</strong> <input type="text" id="postal_code" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>CITY:</strong> <input type="text" id="city" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>COUNTRY:</strong> <input type="text" id="country" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>PASSWORD:</strong> 
+                    <input type="password" id="password" disabled style="text-transform: uppercase;">
+                </label>
+                
+                
+            </div>
+            
+
+            <div class="btn-container">
+                <button class="btn enable">Enable Update</button>
+                <button class="btn update" disabled>Update Profile</button>
+                <button class="btn delete" disabled>Delete</button>
+                <button class="btn cancel" disabled>Cancel</button>
+            </div>
         </div>
     </div>
 
-
     <script>
-        document.querySelector('.btn').addEventListener('click', function () {
-        // Collect the user input from the form (you need to have corresponding inputs in the form)
-        const formData = new FormData();
+         const inputs = document.querySelectorAll('input');
+        const enableButton = document.querySelector('.enable');
+        const updateButton = document.querySelector('.update');
+        const deleteButton = document.querySelector('.delete');
+        const cancelButton = document.querySelector('.cancel');
 
-        // Assuming the user has filled out a form for updating profile details
-        formData.append('fname', document.getElementById('fname').value);
-        formData.append('lname', document.getElementById('lname').value);
-        formData.append('gender', document.getElementById('gender').value);
-        formData.append('dob', document.getElementById('dob').value);
-        formData.append('password', document.getElementById('password').value);
-        formData.append('father_name', document.getElementById('father_name').value);
-        formData.append('mother_name', document.getElementById('mother_name').value);
-        formData.append('nid', document.getElementById('nid_no').value);
-        formData.append('blood_group', document.getElementById('blood_group').value);
-        formData.append('home', document.getElementById('home').value);
-        formData.append('road', document.getElementById('road').value);
-        formData.append('post_office', document.getElementById('post_office').value);
-        formData.append('postal_code', document.getElementById('postal_code').value);
-        formData.append('city', document.getElementById('city').value);
-        formData.append('country', document.getElementById('country').value);
-        formData.append('email', loggedInUser.email);  // Make sure `loggedInUser.email` is the actual user's email
-        
-        // If the user updated the profile picture
-        const profilePic = document.getElementById('profile_picture').files[0];
-        if (profilePic) {
-            formData.append('profile_picture', profilePic);  // Only append if there is a new file
-        }
+        let originalData = {};
 
-        fetch('http://localhost:3000/update_user', {
-            method: 'POST',
-            body: formData  // We are sending the form data with the profile picture and other fields
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Profile updated successfully');
-                // Optionally, you can reload the page or update the UI with the new profile info
-                location.reload();
-            } else {
-                alert('There was an issue updating the profile');
-            }
-        })
-        .catch(error => console.error('Error updating profile:', error));
-    });
-        // Assuming 'loggedInUser' is an object available with the user's email or other identifier
-        const loggedInUser = {
-            email: "user@example.com"  // Replace this with the actual user email
-        };
+        // Enable inputs for editing
+        enableButton.addEventListener('click', () => {
+            inputs.forEach(input => input.disabled = false);
+            updateButton.disabled = false;
+            deleteButton.disabled = false;
+            cancelButton.disabled = false;
 
-        fetch('http://localhost:3000/home_page', {
+            // Save original data
+            inputs.forEach(input => {
+                originalData[input.id] = input.value;
+            });
+        });
+
+        // Fetch user data based on nid_no
+        window.onload = function() {
+    const nidNo = localStorage.getItem('nid_no');
+
+    if (nidNo) {
+        fetch('http://localhost:3000/home_page/nid', {  // Ensure this URL matches your backend route
             method: 'POST',
             headers: {
-                'Accept': 'application/json, text/plain, */*',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email: loggedInUser.email })
+            body: JSON.stringify({ nid_no: nidNo }) // Sending NID for fetching data
         })
-        .then(res => res.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
-            console.log(data);
-            const userData = data.result[0];
-            const dob = new Date(userData.dob);
-            const formattedDob = dob.toDateString();
+            if (data.result) {
+                const userData = data.result;
 
-            // Update HTML elements with the fetched data
-            document.getElementById("first_name").textContent = userData.fname + ' ' + userData.lname;
-            document.getElementById("id_no").textContent = userData.id;
-            document.getElementById("father_name").textContent = userData.father_name;
-            document.getElementById("mother_name").textContent = userData.mother_name;
-            document.getElementById("nid_no").textContent = userData.nid;
-            document.getElementById("dob").textContent = formattedDob;
-            document.getElementById("blood_group").textContent = userData.blood_group;
-            document.getElementById("home").textContent = userData.home;
-            document.getElementById("road").textContent = userData.road;
-            document.getElementById("post_office").textContent = userData.post_office;
-            document.getElementById("postal_code").textContent = userData.postal_code;
-            document.getElementById("city").textContent = userData.city;
-            document.getElementById("country").textContent = userData.country;
-            document.getElementById("password").textContent = '*******';  // Mask password
-            document.getElementById("created_at").textContent = new Date(userData.created_at).toLocaleDateString();
+                document.getElementById('fname').value = userData.fname || '';
+                document.getElementById('lname').value = userData.lname || '';
+                document.getElementById('id_no').value = userData.id_no || '';
+                document.getElementById('father_name').value = userData.father_name || '';
+                document.getElementById('mother_name').value = userData.mother_name || '';
+                document.getElementById('nid_no').value = userData.nid_no || '';
+                document.getElementById('dob').value = userData.dob ? new Date(userData.dob).toISOString().slice(0, 10) : '';
+                document.getElementById('blood_group').value = userData.blood_group || '';
+                document.getElementById('home').value = userData.home || '';
+                document.getElementById('road').value = userData.road || '';
+                document.getElementById('post_office').value = userData.post_office || '';
+                document.getElementById('postal_code').value = userData.postal_code || '';
+                document.getElementById('city').value = userData.city || '';
+                document.getElementById('country').value = userData.country || '';
 
-            // Update the profile picture
-            if (userData.profile_picture && userData.profile_picture.startsWith('data:image')) {
-                document.getElementById("currentProfilePicture").src = userData.profile_picture;
-            } else if (userData.profile_picture) {
-                document.getElementById("currentProfilePicture").src = `http://localhost:3000/image/${userData.profile_picture}`;
+                // Set the profile picture based on the data format
+                const profilePictureElement = document.getElementById("currentProfilePicture");
+                if (userData.profile_picture && userData.profile_picture.startsWith('data:image')) {
+                    profilePictureElement.src = userData.profile_picture; // Base64 image
+                } else if (userData.profile_picture) { 
+                    profilePictureElement.src = `http://localhost:3000/image/${userData.profile_picture}`; // URL image
+                } else {
+                    profilePictureElement.src = ''; // Set a default image or empty if no picture
+                }
+
+                // Note: Remove this line if you don't want to show the password
+                document.getElementById('password').value = userData.password || ''; 
+            } else {
+                console.error('No user data found for this NID.');
+                alert('No user data found. Please check your NID.');
             }
         })
-        .catch(error => console.error('Error fetching data:', error));
+        .catch(error => {
+            console.error('Error fetching user data:', error);
+            alert('Failed to fetch data. Please try again later.');
+        });
+    } else {
+        alert('NID not found in localStorage.');
+    }
+};
+
+        // Update user data
+        updateButton.addEventListener('click', () => {
+    const formData = new FormData();
+
+    // Collect all inputs except disabled ones
+    inputs.forEach(input => {
+        if (!input.disabled && input.value !== '') {
+            formData.append(input.id, input.value);
+        }
+    });
+
+    // Assuming a file input for profile picture upload
+    const profilePicInput = document.querySelector('input[type="file"]');
+    if (profilePicInput && profilePicInput.files[0]) {
+        formData.append('profile_picture', profilePicInput.files[0]);
+    }
+
+    // Collect the new password (assuming the password field has id="new_password")
+    const passwordInput = document.getElementById('password');
+if (passwordInput && passwordInput.value !== '') {
+    formData.append('password', passwordInput.value);
+    
+}
+
+    // Make the request to the server
+    fetch('http://localhost:3000/update_user', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Profile updated successfully');
+            window.location.href = './login.html';
+        } else {
+            alert('Failed to update profile');
+        }
+    })
+    .catch(error => console.error('Error updating user data:', error));
+});
+
+
+        // Delete user
+        deleteButton.addEventListener('click', () => {
+            const nidNo = document.getElementById('nid_no').value;
+
+            fetch('http://localhost:3000/delete_user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ nid_no: nidNo })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Profile deleted successfully');
+                    window.location.href = './login.html';
+                } else {
+                    alert('Failed to delete profile');
+                }
+            })
+            .catch(error => console.error('Error deleting user:', error));
+        });
+
+        // Cancel changes
+        cancelButton.addEventListener('click', () => {
+            inputs.forEach(input => {
+                input.value = originalData[input.id];
+                input.disabled = true;
+            });
+
+            updateButton.disabled = true;
+            deleteButton.disabled = true;
+            cancelButton.disabled = true;
+        });
     </script>
 
 </body>
 </html>
-
