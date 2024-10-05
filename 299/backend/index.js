@@ -3,10 +3,9 @@
 // npm install express
 // npm install cors
 // npm install body-parser
-//npm install bcrypt
+// npm install bcrypt
 // npm install nodemon
 // to open node post-end-point.js or nodemon index.js
-
 
 
 
@@ -15,27 +14,32 @@ const mysql = require('mysql');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
-
+const multer = require('multer');
+const path = require('path');
 
 const app = express();
 const port = 3000;
 
+// Configure multer for profile picture upload
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); // Specify upload directory
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); // Rename file to avoid conflicts
+  }
+});
+const upload = multer({ storage: storage, limits: { fileSize: 1024 * 1024 * 5 } }); // Limit file size to 5MB
 
-app.use(cors());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-
-
-const connection = mysql.createConnection({
+// Database connection setup
+const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-   
+  
   database: 'digitaldemocracy'
 });
 
-
-connection.connect(err => {
+db.connect(err => {
   if (err) {
     console.error('Error connecting to MySQL:', err);
   } else {
@@ -43,52 +47,21 @@ connection.connect(err => {
   }
 });
 
+// Middleware
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use('/uploads', express.static('uploads')); // Serve uploaded files
 
-app.post('/user_check', (req, res) => {
-  const { nid_no, password } = req.body;
-
-
-  if (!nid_no || !password) {
-    return res.status(400).json({ error: 'NID No and Password are required.' });
-  }
-
-
-  // Check if the user exists
-  connection.query('SELECT * FROM voter WHERE nid_no = ?', [nid_no], (err, result) => {
-    if (err) {
-      return res.status(500).json({ error: 'Database query error.' });
-    }
-
-
-    if (result.length === 0) {
-      return res.status(400).json({ error: 'No user found with this NID No.' });
-    }
-
-
-    const user = result[0];
-
-
-    // Compare the hashed password
-    bcrypt.compare(password, user.password, (err, isMatch) => {
-      if (err) {
-        return res.status(500).json({ error: 'Error comparing passwords.' });
-      }
-
-
-      if (!isMatch) {
-        return res.status(400).json({ error: 'Invalid password.' });
-      }
-
-
-      res.json({ message: 'Login successful', user });
-    });
-  });
-});
-
-
-app.post('/add_voter', (req, res) => {
+// Registration route
+// Registration route
+app.post('/add_voter', upload.single('profile_picture'), (req, res) => {
   const {
-    name,
+    fname,
+    lname,
+    email,
+    phone_number,
+    gender,
     father_name,
     mother_name,
     nid_no,
@@ -103,56 +76,238 @@ app.post('/add_voter', (req, res) => {
     password
   } = req.body;
 
-
-  if (!name || !father_name || !mother_name || !nid_no || !dob || !password) {
-    return res.status(400).json({ error: 'All required fields must be filled.' });
+  if (!fname || !lname || !email || !nid_no || !password || !phone_number) {
+    return res.status(400).json({ error: 'Please fill in all required fields.' });
   }
 
+  let profile_picture;
+  if (req.file) {
+    profile_picture = req.file.path;
+  } else {
+    return res.status(400).json({ error: 'Please upload a profile picture.' });
+  }
 
-  // Check if the National ID already exists
-  connection.query('SELECT * FROM voter WHERE nid_no = ?', [nid_no], (err, result) => {
-    if (err) {
-      return res.status(500).json({ error: 'Database query error.' });
-    }
+  db.query('SELECT * FROM voter WHERE nid_no = ?', [nid_no], (err, result) => {
+    if (err) return res.status(500).json({ error: 'Database query error.' });
+    if (result.length > 0) return res.status(400).json({ error: 'National ID already registered.' });
 
-
-    if (result.length > 0) {
-      return res.status(400).json({ error: 'National ID already registered.' });
-    }
-
-
-    // Hash the password
     bcrypt.hash(password, 10, (err, hashedPassword) => {
+      if (err) return res.status(500).json({ error: 'Error hashing password.' });
+
+      const sql = `INSERT INTO voter 
+    (fname, lname, email, phone_number, gender, father_name, mother_name, nid_no, dob, blood_group, home, road, post_office, postal_code, city, country, password, profile_picture)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+const values = [
+    fname, lname, email, phone_number, gender, father_name, mother_name, nid_no, dob,
+    blood_group, home, road, post_office, postal_code, city, country, hashedPassword, profile_picture
+];
+
+console.log('SQL Query:', sql);
+console.log('Values:', values);  // Add this line to log values
+
+db.query(sql, values, (err, result) => {
+    if (err) {
+        console.error('Database insert error:', err);  // Log the error
+        return res.status(500).json({ error: 'Database insert error.' });
+    }
+    res.status(201).json({ message: 'Registration successful' });
+});
+
+    });
+  });
+});
+
+// User login check route
+app.post('/user_check', (req, res) => {
+  const { nid_no, phone_number, city, password } = req.body;
+
+  if (!nid_no || !phone_number || !city || !password) {
+    return res.status(400).json({ error: 'Please fill in all fields.' });
+  }
+
+  const query = 'SELECT * FROM voter WHERE nid_no = ? AND phone_number = ? AND city = ?';
+  db.query(query, [nid_no, phone_number, city], (err, results) => {
+    if (err) {
+      console.error('Error querying the database:', err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+
+    if (results.length === 0) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const user = results[0];
+
+    bcrypt.compare(password, user.password, (err, isMatch) => {
       if (err) {
-        return res.status(500).json({ error: 'Error hashing password.' });
+        console.error('Error comparing passwords:', err);
+        return res.status(500).json({ error: 'Error validating password' });
       }
 
+      if (!isMatch) {
+        return res.status(401).json({ error: 'Invalid password' });
+      }
 
-      const sql = `
-        INSERT INTO voter
-        (name, father_name, mother_name, nid_no, dob, blood_group, home, road, post_office, postal_code, city, country, password)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `;
-      const values = [
-        name, father_name, mother_name, nid_no, dob, blood_group, home,
-        road, post_office, postal_code, city, country, hashedPassword
-      ];
+      const userData = {
+        id: user.id,
+        fname: user.fname,
+        lname: user.lname,
+        email: user.email,
+        phone_number: user.phone_number,
+        city: user.city,
+        profile_picture: user.profile_picture
+      };
 
-
-      connection.query(sql, values, (err, result) => {
-        if (err) {
-          return res.status(500).json({ error: 'Database insert error.' });
-        }
-        res.json({ message: 'User registered successfully!' });
-      });
+      return res.json({ message: 'Login successful', user: userData });
     });
   });
 });
 
 
+app.post('/update_user', upload.single('profile_picture'), async (req, res) => {
+    const { 
+        fname, 
+        father_name, 
+        mother_name, 
+        nid_no, 
+        dob, 
+        blood_group, 
+        home, 
+        road, 
+        post_office, 
+        postal_code, 
+        city, 
+        country, 
+        new_password 
+    } = req.body;
+
+    console.log('Received new password:', new_password);  // Check if the password is received
+
+    const profilePicturePath = req.file ? req.file.filename : null;
+
+    let query = `
+        UPDATE voter SET fname = ?, father_name = ?, mother_name = ?, dob = ?, 
+        blood_group = ?, home = ?, road = ?, post_office = ?, postal_code = ?, 
+        city = ?, country = ? ${profilePicturePath ? ', profile_picture = ?' : ''} 
+    `;
+
+    const values = [fname, father_name, mother_name, dob, blood_group, home, road, post_office, postal_code, city, country];
+
+    // Hash new password if provided
+    if (new_password) {
+        try {
+            const hashedPassword = await bcrypt.hash(new_password, 10);
+            console.log('Hashed password:', hashedPassword);  // Check if hashing works
+            query += `, password = ?`;
+            values.push(hashedPassword);
+        } catch (err) {
+            console.error('Error hashing password:', err);
+            return res.status(500).json({ error: 'Password hashing error' });
+        }
+    }
+
+    if (profilePicturePath) {
+        values.push(profilePicturePath);
+    }
+
+    query += ` WHERE nid_no = ?`;
+    values.push(nid_no);
+
+    console.log('Query:', query);  // Log the query
+    console.log('Values:', values);  // Log the values
+
+    db.query(query, values, (err, result) => {
+        if (err) {
+            console.error('Database update error:', err);
+            return res.status(500).json({ error: 'Database update error' });
+        }
+        return res.json({ success: true });
+    });
+});
+
+
+// Get user data by NID
+app.post('/home_page/nid', (req, res) => {
+  const { nid_no } = req.body;
+  console.log(`Received NID: ${nid_no}`);
+
+  const query = `SELECT fname, lname, nid_no, id, father_name, mother_name, dob, blood_group, 
+                 home, road, post_office, postal_code, city, country, profile_picture 
+                 FROM voter WHERE nid_no = ?`;
+
+  db.query(query, [nid_no], (err, result) => {
+      if (err) {
+          console.error('Database query error:', err);
+          return res.status(500).json({ error: 'Database query error' });
+      }
+      if (result.length === 0) {
+          console.log('No user found for the provided NID');
+          return res.status(404).json({ error: 'User not found' });
+      }
+
+      console.log('Query result:', result);  // This will print the entire result to the terminal
+      console.log('First result:', result[0]);  // This will print the first result object (user data) to the terminal
+      
+      // Prepare the response without the password
+      const userResponse = {
+          fname: result[0].fname,
+          lname: result[0].lname,
+          id_no: result[0].id,  // Map the 'id' field from the database to 'id_no' for the front-end
+          nid_no: result[0].nid_no,
+          father_name: result[0].father_name,
+          mother_name: result[0].mother_name,
+          dob: result[0].dob,
+          blood_group: result[0].blood_group,
+          home: result[0].home,
+          road: result[0].road,
+          post_office: result[0].post_office,
+          postal_code: result[0].postal_code,
+          city: result[0].city,
+          country: result[0].country,
+          profile_picture: result[0].profile_picture,
+          password: '********' // Show password as asterisks
+      };
+
+      return res.json({ result: userResponse });  // Send back the modified result to the frontend
+  });
+});
+
+// Delete user profile
+app.post('/delete_user', (req, res) => {
+    const { nid_no } = req.body;
+
+    // Get user data to delete profile picture from the server
+    db.query('SELECT profile_picture FROM voter WHERE nid_no = ?', [nid_no], (err, result) => {
+        if (err) return res.status(500).json({ error: 'Database query error' });
+        if (result.length === 0) return res.status(404).json({ error: 'User not found' });
+
+        const profilePicture = result[0].profile_picture;
+
+        // Delete user from database
+        db.query('DELETE FROM voter WHERE nid_no = ?', [nid_no], (err, result) => {
+            if (err) return res.status(500).json({ error: 'Database delete error' });
+
+            // Delete profile picture from server if it exists
+            if (profilePicture && fs.existsSync(`uploads/${profilePicture}`)) {
+                fs.unlink(`uploads/${profilePicture}`, err => {
+                    if (err) console.error('Error deleting profile picture:', err);
+                });
+            }
+
+            return res.json({ success: true });
+        });
+    });
+});
+
+
+// Start the server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
+
+
+
 
 
 
