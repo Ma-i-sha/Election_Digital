@@ -9,7 +9,6 @@
 
 
 const fs = require('fs');
-
 const express = require('express');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
@@ -32,17 +31,17 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
+    const fileName = Date.now() + path.extname(file.originalname);
+    cb(null, fileName);
   }
 });
 const upload = multer({ storage: storage });
-
 
 // Database connection setup
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  
+  password: '',
   database: 'digitaldemocracy'
 });
 
@@ -60,7 +59,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads')); // Serve uploaded files
 
-// Registration route
 // Registration route
 app.post('/add_voter', upload.single('profile_picture'), (req, res) => {
   const {
@@ -89,7 +87,7 @@ app.post('/add_voter', upload.single('profile_picture'), (req, res) => {
 
   let profile_picture;
   if (req.file) {
-    profile_picture = req.file.path;
+    profile_picture = `uploads/${req.file.filename}`;  // Save only the relative path
   } else {
     return res.status(400).json({ error: 'Please upload a profile picture.' });
   }
@@ -102,25 +100,19 @@ app.post('/add_voter', upload.single('profile_picture'), (req, res) => {
       if (err) return res.status(500).json({ error: 'Error hashing password.' });
 
       const sql = `INSERT INTO voter 
-    (fname, lname, email, phone_number, gender, father_name, mother_name, nid_no, dob, blood_group, home, road, post_office, postal_code, city, country, password, profile_picture)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        (fname, lname, email, phone_number, gender, father_name, mother_name, nid_no, dob, blood_group, home, road, post_office, postal_code, city, country, password, profile_picture)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-const values = [
-    fname, lname, email, phone_number, gender, father_name, mother_name, nid_no, dob,
-    blood_group, home, road, post_office, postal_code, city, country, hashedPassword, profile_picture
-];
-
-console.log('SQL Query:', sql);
-console.log('Values:', values);  // Add this line to log values
-
-db.query(sql, values, (err, result) => {
-    if (err) {
-        console.error('Database insert error:', err);  // Log the error
-        return res.status(500).json({ error: 'Database insert error.' });
-    }
-    res.status(201).json({ message: 'Registration successful' });
-});
-
+      const values = [
+        fname, lname, email, phone_number, gender, father_name, mother_name, nid_no, dob,
+        blood_group, home, road, post_office, postal_code, city, country, hashedPassword, profile_picture
+      ];
+      console.log('SQL Query:', sql);
+      console.log('Values:', values);  // Add this line to log values
+      db.query(sql, values, (err, result) => {
+        if (err) return res.status(500).json({ error: 'Database insert error.' });
+        res.status(201).json({ message: 'Registration successful' });
+      });
     });
   });
 });
@@ -241,7 +233,7 @@ app.post('/home_page/nid', (req, res) => {
   console.log(`Received NID: ${nid_no}`);
 
   const query = `SELECT fname, lname, nid_no, phone_number, id, father_name, mother_name, dob, blood_group, 
-                 home, road, post_office, postal_code, city, country, profile_picture 
+                 home, road, post_office, postal_code, city, country, profile_picture, password 
                  FROM voter WHERE nid_no = ?`;
 
   db.query(query, [nid_no], (err, result) => {
@@ -257,7 +249,7 @@ app.post('/home_page/nid', (req, res) => {
       console.log('Query result:', result);  // This will print the entire result to the terminal
       console.log('First result:', result[0]);  // This will print the first result object (user data) to the terminal
       
-      // Prepare the response without the password
+      // Prepare the response with the password (not recommended)
       const userResponse = {
           fname: result[0].fname,
           lname: result[0].lname,
@@ -275,12 +267,13 @@ app.post('/home_page/nid', (req, res) => {
           country: result[0].country,
           phone_number: result[0].phone_number,
           profile_picture: result[0].profile_picture,
-          password: '********' // Show password as asterisks
+          password: result[0].password // Sending the hashed password (not secure)
       };
 
-      return res.json({ result: userResponse });  // Send back the modified result to the frontend
+      return res.json({ result: userResponse });
   });
 });
+
 
 // Delete user profile
 app.post('/delete_user', (req, res) => {
@@ -321,7 +314,6 @@ app.post('/delete_user', (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
-
 
 
 
