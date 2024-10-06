@@ -58,6 +58,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads')); // Serve uploaded files
+app.use(express.json());
 
 // Registration route
 app.post('/add_voter', upload.single('profile_picture'), (req, res) => {
@@ -165,65 +166,84 @@ app.post('/user_check', (req, res) => {
 
 
 app.post('/update_user', upload.single('profile_picture'), async (req, res) => {
-    const { 
-        fname, 
-        father_name, 
-        mother_name, 
-        nid_no, 
-        phone_number,
-        dob, 
-        blood_group, 
-        home, 
-        road, 
-        post_office, 
-        postal_code, 
-        city, 
-        country, 
-        new_password 
-    } = req.body;
+  const { 
+      fname, 
+      father_name, 
+      mother_name, 
+      nid_no, 
+      phone_number,
+      dob, 
+      blood_group, 
+      home, 
+      road, 
+      post_office, 
+      postal_code, 
+      city, 
+      country 
+  } = req.body;
 
-    console.log('Received new password:', new_password);  // Check if the password is received
 
-    const profilePicturePath = req.file ? req.file.filename : null;
+  const profilePicturePath = req.file ? req.file.filename : null;
 
-    let query = `
-        UPDATE voter SET fname = ?, father_name = ?, mother_name = ?, dob = ?, 
-        blood_group = ?,phone_number = ?, home = ?, road = ?, post_office = ?, postal_code = ?, 
-        city = ?, country = ? ${profilePicturePath ? ', profile_picture = ?' : ''} 
-    `;
+  // Start constructing the SQL update query
+  let query = `
+      UPDATE voter SET 
+          fname = ?, 
+          father_name = ?, 
+          mother_name = ?, 
+          dob = ?, 
+          blood_group = ?, 
+          phone_number = ?, 
+          home = ?, 
+          road = ?, 
+          post_office = ?, 
+          postal_code = ?, 
+          city = ?, 
+          country = ? 
+  `;
 
-    const values = [fname, father_name, mother_name, dob, blood_group,phone_number, home, road, post_office, postal_code, city, country];
+  const values = [
+      fname, 
+      father_name, 
+      mother_name, 
+      dob, 
+      blood_group, 
+      phone_number, 
+      home, 
+      road, 
+      post_office, 
+      postal_code, 
+      city, 
+      country
+  ];
 
-    // Hash new password if provided
-    if (new_password) {
-        try {
-            const hashedPassword = await bcrypt.hash(new_password, 10);
-            console.log('Hashed password:', hashedPassword);  // Check if hashing works
-            query += `, password = ?`;
-            values.push(hashedPassword);
-        } catch (err) {
-            console.error('Error hashing password:', err);
-            return res.status(500).json({ error: 'Password hashing error' });
-        }
-    }
+  
 
-    if (profilePicturePath) {
-        values.push(profilePicturePath);
-    }
 
-    query += ` WHERE nid_no = ?`;
-    values.push(nid_no);
+  // Add profile picture update to the query if provided
+  if (profilePicturePath) {
+      query += `, profile_picture = ?`;
+      values.push(profilePicturePath);
+  }
 
-    console.log('Query:', query);  // Log the query
-    console.log('Values:', values);  // Log the values
+  // Complete the query with the WHERE clause
+  query += ` WHERE nid_no = ?`;
+  values.push(nid_no);
 
-    db.query(query, values, (err, result) => {
-        if (err) {
-            console.error('Database update error:', err);
-            return res.status(500).json({ error: 'Database update error' });
-        }
-        return res.json({ success: true });
-    });
+  console.log('Query:', query);  // Log the query
+  console.log('Values:', values);  // Log the values
+
+  // Execute the query
+  db.query(query, values, (err, result) => {
+      if (err) {
+          console.error('Database update error:', err);
+          return res.status(500).json({ error: 'Database update error' });
+      }
+      if (result.affectedRows === 0) {
+          return res.status(404).json({ error: 'User not found or no changes made' });
+      }
+      return res.json({ success: true });
+  });
 });
 
 
@@ -233,7 +253,7 @@ app.post('/home_page/nid', (req, res) => {
   console.log(`Received NID: ${nid_no}`);
 
   const query = `SELECT fname, lname, nid_no, phone_number, id, father_name, mother_name, dob, blood_group, 
-                 home, road, post_office, postal_code, city, country, profile_picture, password 
+                 home, road, post_office, postal_code, city, country, profile_picture 
                  FROM voter WHERE nid_no = ?`;
 
   db.query(query, [nid_no], (err, result) => {
@@ -249,11 +269,10 @@ app.post('/home_page/nid', (req, res) => {
       console.log('Query result:', result);  // This will print the entire result to the terminal
       console.log('First result:', result[0]);  // This will print the first result object (user data) to the terminal
       
-      // Prepare the response with the password (not recommended)
       const userResponse = {
           fname: result[0].fname,
           lname: result[0].lname,
-          id_no: result[0].id,  // Map the 'id' field from the database to 'id_no' for the front-end
+          id_no: result[0].id,  
           nid_no: result[0].nid_no,
           father_name: result[0].father_name,
           mother_name: result[0].mother_name,
@@ -267,7 +286,6 @@ app.post('/home_page/nid', (req, res) => {
           country: result[0].country,
           phone_number: result[0].phone_number,
           profile_picture: result[0].profile_picture,
-          password: result[0].password // Sending the hashed password (not secure)
       };
 
       return res.json({ result: userResponse });
@@ -310,6 +328,48 @@ app.post('/delete_user', (req, res) => {
   });
 });
 
+app.post('/api/voters/change-password', async (req, res) => {
+  const { nid_no, oldPassword, newPassword } = req.body;
+
+  try {
+      // Fetch the user from the SQL database using nid_no
+      db.query('SELECT * FROM voter WHERE nid_no = ?', [nid_no], async (err, results) => {
+          if (err) {
+              console.error(err);
+              return res.status(500).json({ success: false, message: 'Server error. Please try again.' });
+          }
+
+          // Check if user exists
+          if (results.length === 0) {
+              return res.status(404).json({ success: false, message: 'User not found.' });
+          }
+
+          const user = results[0];
+
+          // Check if old password is correct
+          const isMatch = await bcrypt.compare(oldPassword, user.password);
+          if (!isMatch) {
+              return res.status(400).json({ success: false, message: 'Old password is incorrect.' });
+          }
+
+          // Hash the new password
+          const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+          // Update the password in the SQL database
+          db.query('UPDATE voter SET password = ? WHERE nid_no = ?', [hashedPassword, nid_no], (updateErr) => {
+              if (updateErr) {
+                  console.error(updateErr);
+                  return res.status(500).json({ success: false, message: 'Could not update password. Please try again.' });
+              }
+
+              res.json({ success: true, message: 'Password changed successfully!' });
+          });
+      });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: 'Server error. Please try again.' });
+  }
+});
 // Start the server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
