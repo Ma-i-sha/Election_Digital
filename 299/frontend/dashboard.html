@@ -244,10 +244,7 @@
                 <label style="font-weight: bold; text-transform: uppercase;">
                     <strong>COUNTRY:</strong> <input type="text" id="country" disabled style="text-transform: uppercase;">
                 </label>
-                <label style="font-weight: bold; text-transform: uppercase;">
-                    <strong>PASSWORD:</strong> 
-                    <input type="password" id="password" disabled style="text-transform: uppercase;">
-                </label>
+                
                 
                 
             </div>
@@ -258,6 +255,8 @@
                 <button class="btn update" disabled>Update Profile</button>
                 <button class="btn delete" disabled>Delete</button>
                 <button class="btn cancel" disabled>Cancel</button>
+                <button class="btn change-password" disabled>Change Password</button> <!-- Added Change Password button -->
+
             </div>
         </div>
     </div>
@@ -268,6 +267,8 @@
         const updateButton = document.querySelector('.update');
         const deleteButton = document.querySelector('.delete');
         const cancelButton = document.querySelector('.cancel');
+        const changePasswordButton = document.querySelector('.change-password');
+
 
         let originalData = {};
 
@@ -277,12 +278,19 @@
             updateButton.disabled = false;
             deleteButton.disabled = false;
             cancelButton.disabled = false;
+            changePasswordButton.disabled = false; // Enable Change Password button
+
+            
 
             // Save original data
             inputs.forEach(input => {
                 originalData[input.id] = input.value;
             });
         });
+        changePasswordButton.addEventListener('click', () => {
+            window.location.href = 'change_password.html';
+        });
+
 
         // Fetch user data based on nid_no
         window.onload = function() {
@@ -333,8 +341,7 @@
                     profilePictureElement.src = '/path/to/default/image.jpg';  // Replace with an actual path to a default image
                 }
 
-                // Optionally show password (mask as asterisks)
-                document.getElementById('password').value = userData.password || ''; 
+                 
             } else {
                 console.error('No user data found for this NID.');
                 alert('No user data found. Please check your NID.');
@@ -351,28 +358,18 @@
 
 
         // Update user data
-        updateButton.addEventListener('click', () => {
+        // Update user data
+updateButton.addEventListener('click', () => {
     const formData = new FormData();
 
     // Collect all inputs except disabled ones
     inputs.forEach(input => {
-        if (!input.disabled && input.value !== '') {
-            formData.append(input.id, input.value);
+        if (!input.disabled) {
+            formData.append(input.id, input.value); // Append all enabled input values
         }
     });
 
-    // Assuming a file input for profile picture upload
-    const profilePicInput = document.querySelector('input[type="file"]');
-    if (profilePicInput && profilePicInput.files[0]) {
-        formData.append('profile_picture', profilePicInput.files[0]);
-    }
-
-    // Collect the new password (assuming the password field has id="new_password")
-    const passwordInput = document.getElementById('password');
-if (passwordInput && passwordInput.value !== '') {
-    formData.append('password', passwordInput.value);
     
-}
 
     // Make the request to the server
     fetch('http://localhost:3000/update_user', {
@@ -393,7 +390,6 @@ if (passwordInput && passwordInput.value !== '') {
 
 
         // Delete user
-       // Assume deleteButton is already defined as the delete button element
 deleteButton.addEventListener('click', () => {
     const nidNo = document.getElementById('nid_no').value;
 
