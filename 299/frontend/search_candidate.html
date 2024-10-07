@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voter Login</title>
+    <title>Voter Search</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -31,7 +31,7 @@
             font-weight: 600;
             letter-spacing: 1px;
         }
-        input[type="text"], input[type="password"], input[type="tel"], select {
+        input[type="text"] {
             width: 100%;
             padding: 12px;
             margin: 10px 0;
@@ -40,7 +40,7 @@
             font-size: 16px;
             transition: border-color 0.2s ease;
         }
-        input:focus, select:focus {
+        input:focus {
             border-color: #4CAF50;
             outline: none;
         }
@@ -65,19 +65,6 @@
         .btn:hover {
             background-color: #45a049;
         }
-        .register-link {
-            text-align: center;
-            margin-top: 15px;
-        }
-        .register-link a {
-            color: #4CAF50;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-        .register-link a:hover {
-            color: #388E3C;
-        }
         .loader {
             display: none;
             position: fixed;
@@ -100,35 +87,12 @@
 <body>
     <div class="loader"></div>
     <div class="container">
-        <h2>Voter Login</h2>
+        <h2>Voter Search</h2>
         <form onsubmit="login(event)">
             <label for="nid_no">NID No</label>
             <input type="text" id="nid_no" name="nid_no" required>
 
-            <label for="phone_number">Phone Number</label>
-            <input type="text" id="phone_number" name="phone_number" required pattern="\d{11}" maxlength="11" title="Must be exactly 11 digits">
-
-            <label for="city">City</label>
-            <select id="city" name="city" required>
-                <option value="">Select City</option>
-                <option value="Barishal">Barishal</option>
-                <option value="Chattogram">Chattogram</option>
-                <option value="Dhaka">Dhaka</option>
-                <option value="Khulna">Khulna</option>
-                <option value="Rajshahi">Rajshahi</option>
-                <option value="Rangpur">Rangpur</option>
-                <option value="Mymensingh">Mymensingh</option>
-                <option value="Sylhet">Sylhet</option>
-            </select>
-
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
-
             <button type="submit" class="btn">Login</button>
-
-            <div class="register-link">
-                <p>Don't have an account? <a href="register.html">Register here</a></p>
-            </div>
         </form>
     </div>
 
@@ -137,41 +101,34 @@
             event.preventDefault();  // Prevent form submission
 
             const nid_no = document.getElementById('nid_no').value.trim();
-            const phone_number = document.getElementById('phone_number').value.trim();
-            const city = document.getElementById('city').value;
-            const password = document.getElementById('password').value.trim();
 
             const loader = document.querySelector('.loader');
             loader.style.display = 'block';  // Show loader
 
             // Validate form inputs
-            if (!nid_no || !phone_number || !city || !password) {
-                alert('Please fill in all fields.');
+            if (!nid_no) {
+                alert('Please enter your NID No.');
                 loader.style.display = 'none';  // Hide loader on error
                 return;
             }
 
-            const user = { nid_no, phone_number, city, password };
-
-            // Send user credentials to the server
-            fetch('http://localhost:3000/user_check', {
+            // Send NID to the server for verification
+            fetch('http://localhost:3000/search_candidate', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json, text/plain, */*',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(user)
+                body: JSON.stringify({ nid_no })
             })
             .then(res => res.json())
             .then(res => {
                 loader.style.display = 'none';  // Hide loader on success/failure
                 if (res.message === "Login successful") {
-                    // Save user data to localStorage
-                    window.localStorage.setItem('nid_no', nid_no);
-                    window.localStorage.setItem('user', JSON.stringify(res.user));
+                    // Save NID as candidate_id in localStorage
+                    window.localStorage.setItem('candidate_id', nid_no);
 
-                    // Redirect to the dashboard
-                    window.location.href = './dashboard.html';
+                    window.location.href = './edit_candidate.html';  // Redirect after success
                 } else {
                     alert(res.error || 'Unknown error occurred.');
                 }

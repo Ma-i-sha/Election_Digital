@@ -197,6 +197,8 @@ input[disabled] {
 
         <div class="profile-pic">
             <img id="currentProfilePicture" src="http://localhost:3000/uploads/1728153031702.jpg" alt="Profile Picture" style="width:150px; height:150px; border-radius:50%;" />
+
+
         </div>
 
         <div class="info-box">
@@ -205,6 +207,8 @@ input[disabled] {
             </div>
 
             <div class="info-content">
+                
+            
                 <label style="font-weight: bold; text-transform: uppercase;">
                     <strong>FIRST NAME:</strong> <input type="text" id="fname" disabled style="text-transform: uppercase;">
                 </label>
@@ -214,9 +218,11 @@ input[disabled] {
                 <label style="font-weight: bold; text-transform: uppercase;">
                     <strong>ID:</strong> <input type="text" id="id_no" disabled style="text-transform: uppercase;">
                 </label>
+                
                 <label style="font-weight: bold; text-transform: uppercase;">
                     <strong>PHONE NUMBER:</strong> <input type="text" id="phone_number" disabled style="text-transform: uppercase;">
                 </label>
+
                 <label style="font-weight: bold; text-transform: uppercase;">
                     <strong>FATHER NAME:</strong> <input type="text" id="father_name" disabled style="text-transform: uppercase;">
                 </label>
@@ -250,79 +256,193 @@ input[disabled] {
                 <label style="font-weight: bold; text-transform: uppercase;">
                     <strong>COUNTRY:</strong> <input type="text" id="country" disabled style="text-transform: uppercase;">
                 </label>
+                
+                
+                
             </div>
+            
 
             <div class="btn-container">
-                <button class="btn change-password" id="changePasswordButton">Change Password</button> 
+                <button class="btn enable">Enable Update</button>
+                <button class="btn update" disabled>Update Profile</button>
+                <button class="btn delete" disabled>Delete</button>
+                <button class="btn cancel" disabled>Cancel</button>
+                <button class="btn change-password" disabled>Change Password</button> <!-- Added Change Password button -->
+
             </div>
         </div>
     </div>
 
     <script>
-        // Attach event listener to change password button
-        document.getElementById('changePasswordButton').addEventListener('click', () => {
+         const inputs = document.querySelectorAll('input');
+        const enableButton = document.querySelector('.enable');
+        const updateButton = document.querySelector('.update');
+        const deleteButton = document.querySelector('.delete');
+        const cancelButton = document.querySelector('.cancel');
+        const changePasswordButton = document.querySelector('.change-password');
+
+
+        let originalData = {};
+
+        // Enable inputs for editing
+        enableButton.addEventListener('click', () => {
+            inputs.forEach(input => input.disabled = false);
+            updateButton.disabled = false;
+            deleteButton.disabled = false;
+            cancelButton.disabled = false;
+            changePasswordButton.disabled = false; // Enable Change Password button
+
+            
+
+            // Save original data
+            inputs.forEach(input => {
+                originalData[input.id] = input.value;
+            });
+        });
+        changePasswordButton.addEventListener('click', () => {
             window.location.href = 'change_password.html';
         });
 
+
         // Fetch user data based on nid_no
         window.onload = function() {
-            const nidNo = localStorage.getItem('nid_no');
+    const nidNo = localStorage.getItem('nid_no');
 
-            if (nidNo) {
-                fetch('http://localhost:3000/home_page/nid', {  // Ensure this URL matches your backend route
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ nid_no: nidNo }) // Sending NID for fetching data
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.result) {
-                        const userData = data.result;
-
-                        // Set form values
-                        document.getElementById('fname').value = userData.fname || '';
-                        document.getElementById('lname').value = userData.lname || '';
-                        document.getElementById('id_no').value = userData.id_no || '';
-                        document.getElementById('phone_number').value = userData.phone_number || '';
-                        document.getElementById('father_name').value = userData.father_name || '';
-                        document.getElementById('mother_name').value = userData.mother_name || '';
-                        document.getElementById('nid_no').value = userData.nid_no || '';
-                        document.getElementById('dob').value = userData.dob ? new Date(userData.dob).toISOString().slice(0, 10) : '';
-                        document.getElementById('blood_group').value = userData.blood_group || '';
-                        document.getElementById('home').value = userData.home || '';
-                        document.getElementById('ward').value = userData.ward || '';
-                        document.getElementById('post_office').value = userData.post_office || '';
-                        document.getElementById('postal_code').value = userData.postal_code || '';
-                        document.getElementById('city').value = userData.city || '';
-                        document.getElementById('country').value = userData.country || '';
-
-                        // Set the profile picture
-                        const profilePictureElement = document.getElementById("currentProfilePicture");
-                        if (userData.profile_picture) {
-                            profilePictureElement.src = `http://localhost:3000/${userData.profile_picture}`;
-                        } else {
-                            profilePictureElement.src = '/path/to/default/image.jpg';  // Replace with actual default image path
-                        }
-                    } else {
-                        console.error('No user data found for this NID.');
-                        alert('No user data found. Please check your NID.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching user data:', error);
-                    alert('Failed to fetch data. Please try again later.');
-                });
-            } else {
-                alert('NID not found in localStorage.');
+    if (nidNo) {
+        fetch('http://localhost:3000/home_page/nid', {  // Ensure this URL matches your backend route
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ nid_no: nidNo }) // Sending NID for fetching data
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
-        };
+            return response.json();
+        })
+        .then(data => {
+            if (data.result) {
+                const userData = data.result;
+
+                // Set form values
+                document.getElementById('fname').value = userData.fname || '';
+                document.getElementById('lname').value = userData.lname || '';
+                document.getElementById('id_no').value = userData.id_no || '';
+                document.getElementById('phone_number').value = userData.phone_number || '';
+                document.getElementById('father_name').value = userData.father_name || '';
+                document.getElementById('mother_name').value = userData.mother_name || '';
+                document.getElementById('nid_no').value = userData.nid_no || '';
+                document.getElementById('dob').value = userData.dob ? new Date(userData.dob).toISOString().slice(0, 10) : '';
+                document.getElementById('blood_group').value = userData.blood_group || '';
+                document.getElementById('home').value = userData.home || '';
+                document.getElementById('ward').value = userData.ward || '';
+                document.getElementById('post_office').value = userData.post_office || '';
+                document.getElementById('postal_code').value = userData.postal_code || '';
+                document.getElementById('city').value = userData.city || '';
+                document.getElementById('country').value = userData.country || '';
+
+                // Set the profile picture
+                const profilePictureElement = document.getElementById("currentProfilePicture");
+                if (userData.profile_picture) {
+                    // If profile picture exists, update the img src
+                    profilePictureElement.src = `http://localhost:3000/${userData.profile_picture}`;
+                } else {
+                    // Provide a default image in case no profile picture exists
+                    profilePictureElement.src = '/path/to/default/image.jpg';  // Replace with an actual path to a default image
+                }
+
+                 
+            } else {
+                console.error('No user data found for this NID.');
+                alert('No user data found. Please check your NID.');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching user data:', error);
+            alert('Failed to fetch data. Please try again later.');
+        });
+    } else {
+        alert('NID not found in localStorage.');
+    }
+};
+
+
+        // Update user data
+        // Update user data
+updateButton.addEventListener('click', () => {
+    const formData = new FormData();
+
+    // Collect all inputs except disabled ones
+    inputs.forEach(input => {
+        if (!input.disabled) {
+            formData.append(input.id, input.value); // Append all enabled input values
+        }
+    });
+
+    
+
+    // Make the request to the server
+    fetch('http://localhost:3000/update_user', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Profile updated successfully');
+            window.location.href = './edit_voter.html';
+        } else {
+            alert('Failed to update profile');
+        }
+    })
+    .catch(error => console.error('Error updating user data:', error));
+});
+
+
+        // Delete user
+deleteButton.addEventListener('click', () => {
+    const nidNo = document.getElementById('nid_no').value;
+
+    fetch('http://localhost:3000/delete_user', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nid_no: nidNo })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            alert('Profile deleted successfully');
+            window.location.href = './login.html';
+        } else {
+            alert('Failed to delete profile: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        alert('Error deleting user: ' + error.message);
+        console.error('Error deleting user:', error);
+    });
+});
+
+        // Cancel changes
+        cancelButton.addEventListener('click', () => {
+            inputs.forEach(input => {
+                input.value = originalData[input.id];
+                input.disabled = true;
+            });
+
+            updateButton.disabled = true;
+            deleteButton.disabled = true;
+            cancelButton.disabled = true;
+        });
     </script>
 
 </body>
