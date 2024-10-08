@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Voting Management System</title>
+  <title>Election Management System</title>
   <style>
     * {
       margin: 0;
@@ -12,7 +12,7 @@
     }
 
     body {
-      background-image: url('../images/voting.jpg');
+      background-image: url('../images/school.jpg');
       background-size: cover;
       background-position: center;
       font-family: Arial, sans-serif;
@@ -45,7 +45,7 @@
       left: 50;
       margin: auto;
       margin-top: 15%;
-      font-family: Arial, Helvetica, sans-serif;
+      text-align: center;
     }
 
     .login-option {
@@ -53,40 +53,27 @@
       padding: 20px;
       border-radius: 5px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      width: calc(25% - 20px);
+      width: calc(30% - 20px);
       box-sizing: border-box;
+      margin: 10px;
+      transition: background-color 0.3s;
     }
 
     .login-option:hover {
-      background-color: lightgreen;
-    }
-
-    .login-section {
-      top: 50%;
-      left: 50;
-      margin: auto;
-      margin-top: 15%;
-      text-align: center;
+      background-color: aqua;
     }
 
     .login-section h2 {
-      margin-left: auto;
-      margin-right: auto;
-      border-radius: 5px;
-      width: calc(25% - 20px);
-      box-sizing: border-box;
-      background-color: lightblue;
       margin-bottom: 20px;
+      background-color: aquamarine;
+      padding: 10px;
+      border-radius: 5px;
     }
 
     .login-options {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-    }
-
-    .login-option {
-      margin: 0 10px;
     }
 
     .login-option a {
@@ -113,8 +100,8 @@
 <body>
   <header>
     <div class="container">
-      <img src="../images/vote.png" alt="Voting Logo" class="logo">
-      <h1>Voting Management System</h1>
+      <img src="../images/logo.png" alt="Election Logo" class="logo">
+      <h1>Election Management System</h1>
     </div>
   </header>
 
@@ -123,18 +110,18 @@
       <h2>Login As</h2>
       <div class="login-options">
         <div class="login-option">
-          <a href="admin_login.html"><img src="../images/administrator.png" alt="Admin Logo" class="logo"><br><br>Administrator</a>
+          <a href="admin_login.html"><img src="../images/admin.png" alt="Administrator" class="logo"><br><br>Administrator</a>
         </div>
         <div class="login-option">
-          <a href="login.html"><img src="../images/voter.png" alt="Voter Logo" class="logo"><br><br>Voter</a>
+          <a href="voter_login.html"><img src="../images/voter.png" alt="Voter" class="logo"><br><br>Voter</a>
         </div>
       </div>
     </section>
   </main>
-  <br><br><br>
+
   <footer>
     <div class="container">
-      <p>&copy; 2024 Voting Management System. All rights reserved.</p>
+      <p>&copy; 2024 Election Management System. All rights reserved.</p>
     </div>
   </footer>
 </body>

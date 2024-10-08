@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voter Search</title>
+    <title>Candidate Search</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -71,8 +71,8 @@
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
-            border: 4px solid #f3f3f3; /* Light grey */
-            border-top: 4px solid #3498db; /* Blue */
+            border: 4px solid #f3f3f3; 
+            border-top: 4px solid #3498db; 
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -87,7 +87,7 @@
 <body>
     <div class="loader"></div>
     <div class="container">
-        <h2>Voter Search</h2>
+        <h2>Candidate Search</h2>
         <form onsubmit="login(event)">
             <label for="nid_no">NID No</label>
             <input type="text" id="nid_no" name="nid_no" required>
@@ -103,12 +103,12 @@
             const nid_no = document.getElementById('nid_no').value.trim();
 
             const loader = document.querySelector('.loader');
-            loader.style.display = 'block';  // Show loader
+            loader.style.display = 'block';  
 
             // Validate form inputs
             if (!nid_no) {
                 alert('Please enter your NID No.');
-                loader.style.display = 'none';  // Hide loader on error
+                loader.style.display = 'none';  
                 return;
             }
 
@@ -123,7 +123,7 @@
             })
             .then(res => res.json())
             .then(res => {
-                loader.style.display = 'none';  // Hide loader on success/failure
+                loader.style.display = 'none';  
                 if (res.message === "Login successful") {
                     // Save NID as candidate_id in localStorage
                     window.localStorage.setItem('candidate_id', nid_no);
@@ -135,7 +135,7 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                loader.style.display = 'none';  // Hide loader on error
+                loader.style.display = 'none';  
                 alert('An error occurred while processing your request.');
             });
         }

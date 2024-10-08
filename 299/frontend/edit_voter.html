@@ -5,30 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voter Profile</title>
     <style>
-        /* EXISTING CSS STYLES */
-        /* UPDATED CSS STYLES */
+        
 body {
     font-family: 'Helvetica Neue', sans-serif;
     background-color: #e6e6e6;
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Prevents page scroll */
-    height: 100vh; /* Ensures full viewport height */
+    overflow: hidden; 
+    height: 100vh; 
 }
 
 .container {
     width: 80%;
     max-width: 1200px;
-    margin: 0 auto; /* Center the container */
+    margin: 0 auto; 
     background: #fff;
     padding: 20px;
     border-radius: 15px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-wrap: wrap;
-    height: 100vh; /* Make container take full viewport height */
-    overflow-y: auto; /* In case the content overflows, only scroll inside the container */
-    box-sizing: border-box; /* Includes padding in element's width/height */
+    height: 100vh; 
+    overflow-y: auto; 
+    box-sizing: border-box; 
     transition: all 0.3s ease-in-out;
 }
 
@@ -51,7 +50,7 @@ body {
     flex-wrap: wrap;
     width: 100%;
     align-items: center;
-    justify-content: center; /* Centers content horizontally */
+    justify-content: center; 
 }
 
 .profile-pic {
@@ -78,7 +77,7 @@ body {
     margin-top: auto;
     margin-bottom: auto;
     box-sizing: border-box;
-    width: 100%; /* Ensure info-box takes full width */
+    width: 100%; 
 }
 
 .info-header {
@@ -93,8 +92,8 @@ body {
     display: block;
     margin: 10px 0;
     font-size: 1.1em;
-    font-weight: bold; /* Makes label text bold */
-    text-transform: uppercase; /* Makes label text uppercase */
+    font-weight: bold; 
+    text-transform: uppercase; 
 }
 
 .info-content strong {
@@ -165,8 +164,8 @@ input[disabled] {
 @media (max-width: 768px) {
     .container {
         padding: 10px;
-        height: auto; /* Allows the container to expand vertically */
-        overflow-y: auto; /* Scroll content only inside the container */
+        height: auto; 
+        overflow-y: auto; 
     }
 
     .profile-pic {
@@ -369,7 +368,7 @@ input[disabled] {
 };
 
 
-        // Update user data
+        
         // Update user data
 updateButton.addEventListener('click', () => {
     const formData = new FormData();
