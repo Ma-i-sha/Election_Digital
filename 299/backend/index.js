@@ -128,49 +128,57 @@ db.query(sql, values, (err, result) => {
 
 // User login check route
 app.post('/user_check', (req, res) => {
-  const { nid_no, phone_number, city, password } = req.body;
+  const { nid_no, phone_number, city, ward, password } = req.body;  // Include ward
 
-  if (!nid_no || !phone_number || !city || !password) {
-    return res.status(400).json({ error: 'Please fill in all fields.' });
+  // Validate input fields
+  if (!nid_no || !phone_number || !city || !ward || !password) {
+      return res.status(400).json({ error: 'Please fill in all fields.' });
   }
 
-  const query = 'SELECT * FROM voter WHERE nid_no = ? AND phone_number = ? AND city = ?';
-  db.query(query, [nid_no, phone_number, city], (err, results) => {
-    if (err) {
-      console.error('Error querying the database:', err);
-      return res.status(500).json({ error: 'Database error' });
-    }
-
-    if (results.length === 0) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    const user = results[0];
-
-    bcrypt.compare(password, user.password, (err, isMatch) => {
+  // Adjust the query to include the ward
+  const query = 'SELECT * FROM voter WHERE nid_no = ? AND phone_number = ? AND city = ? AND ward = ?';  // Include ward
+  db.query(query, [nid_no, phone_number, city, ward], (err, results) => {
       if (err) {
-        console.error('Error comparing passwords:', err);
-        return res.status(500).json({ error: 'Error validating password' });
+          console.error('Error querying the database:', err);
+          return res.status(500).json({ error: 'Database error' });
       }
 
-      if (!isMatch) {
-        return res.status(401).json({ error: 'Invalid password' });
+      // Check if any results are returned
+      if (results.length === 0) {
+          return res.status(401).json({ error: 'Invalid credentials' });
       }
 
-      const userData = {
-        id: user.id,
-        fname: user.fname,
-        lname: user.lname,
-        email: user.email,
-        phone_number: user.phone_number,
-        city: user.city,
-        profile_picture: user.profile_picture
-      };
+      const user = results[0];
 
-      return res.json({ message: 'Login successful', user: userData });
-    });
+      // Validate password
+      bcrypt.compare(password, user.password, (err, isMatch) => {
+          if (err) {
+              console.error('Error comparing passwords:', err);
+              return res.status(500).json({ error: 'Error validating password' });
+          }
+
+          if (!isMatch) {
+              return res.status(401).json({ error: 'Invalid password' });
+          }
+
+          // Construct user data for response
+          const userData = {
+              id: user.id,
+              fname: user.fname,
+              lname: user.lname,
+              email: user.email,
+              phone_number: user.phone_number,
+              city: user.city,
+              ward: user.ward,  // Include ward in user data
+              profile_picture: user.profile_picture
+          };
+
+          // Send success response
+          return res.json({ message: 'Login successful', user: userData });
+      });
   });
 });
+
 
 
 app.post('/update_user', upload.single('profile_picture'), async (req, res) => {
@@ -341,24 +349,24 @@ app.post('/login_admin', (req, res) => {
 
   // Check if both fields are filled
   if (!admin_id || !password) {
-      return res.status(400).json({ status: 'error', message: 'Please enter both admin ID and password.' });
+    return res.status(400).json({ status: 'error', message: 'Please enter both admin ID and password.' });
   }
 
   // SQL query to check if admin_id and password match
   const sql = 'SELECT * FROM administrator WHERE admin_id = ? AND password = ?';
-
+  
   db.query(sql, [admin_id, password], (err, result) => {
-      if (err) {
-          return res.status(500).json({ status: 'error', message: 'Database error: ' + err });
-      }
+    if (err) {
+      return res.status(500).json({ status: 'error', message: 'Database error: ' + err });
+    }
 
-      if (result.length > 0) {
-          // If a match is found, login is successful
-          return res.json({ status: 'success', message: 'Login successful!' });
-      } else {
-          // No match, login failed
-          return res.json({ status: 'error', message: 'Invalid admin ID or password.' });
-      }
+    if (result.length > 0) {
+      // If a match is found, login is successful
+      return res.json({ status: 'success', message: 'Login successful!' });
+    } else {
+      // No match, login failed
+      return res.json({ status: 'error', message: 'Invalid admin ID or password.' });
+    }
   });
 });
 // Candidate count route
@@ -473,14 +481,14 @@ app.post('/candidate/get_candidate', (req, res) => {
 
 // API to update candidate data
 app.post('/candidate/update_candidate', upload.single('profile_picture'), async (req, res) => {
-  const { id, fname, lname, nid_no, ward_no, city, new_password } = req.body;
+  const { id, fname, lname, nid_no, ward, city, new_password } = req.body;
 
   if (!id) {
       return res.status(400).send({ message: 'Candidate ID is required' });
   }
 
-  let query = `UPDATE candidate SET fname = ?, lname = ?, nid_no = ?, ward_no = ?, city = ?`;
-  const values = [fname, lname, nid_no, ward_no, city];
+  let query = `UPDATE candidate SET fname = ?, lname = ?, nid_no = ?, ward = ?, city = ?`;
+  const values = [fname, lname, nid_no, ward, city];
 
   // Handle profile picture upload
   if (req.file) {
@@ -596,11 +604,87 @@ app.post('/search_candidate', (req, res) => {
   });
 });
 
+app.post('/view_candidates', (req, res) => {
+  const { ward, city } = req.body; // Destructure ward and city from request body
+
+  // Check if ward and city are provided
+  if (!ward || !city) {
+    return res.status(400).json({ error: 'Ward and city are required' });
+  }
+
+  // Query to select candidates filtered by ward and city
+  const query = 'SELECT * FROM candidate WHERE ward = ? AND city = ?';
+  
+  // Execute the query with ward and city values as parameters
+  db.query(query, [ward, city], (err, results) => {
+    if (err) {
+      console.error('Error fetching data:', err);
+      return res.status(500).json({ error: 'Database query failed' });
+    }
+    
+    // If no candidates found, send an appropriate message
+    if (results.length === 0) {
+      return res.status(404).json({ result: [], message: 'No candidates found for the selected ward and city.' });
+    }
+
+    // Send the filtered results as JSON
+    res.json({ result: results });
+  });
+});
+
+app.post('/api/voters/change-password', (req, res) => {
+  const { nid_no, oldPassword, newPassword } = req.body;
+
+  // Input validation
+  if (!nid_no || !oldPassword || !newPassword) {
+      return res.status(400).json({ success: false, message: 'All fields are required.' });
+  }
+
+  // Fetch the user's hashed password
+  const query = 'SELECT password FROM voters WHERE nid_no = ?';
+  db.query(query, [nid_no], (error, results) => {
+      if (error) {
+          return res.status(500).json({ success: false, message: 'Database error.' });
+      }
+
+      if (results.length === 0) {
+          return res.status(404).json({ success: false, message: 'User not found.' });
+      }
+
+      const hashedOldPassword = results[0].password; // The stored hashed password
+
+      // Verify the old password
+      bcrypt.compare(oldPassword, hashedOldPassword, (err, isMatch) => {
+          if (err) {
+              return res.status(500).json({ success: false, message: 'Error verifying old password.' });
+          }
+          if (!isMatch) {
+              return res.status(401).json({ success: false, message: 'Old password is incorrect.' });
+          }
+
+          // If old password is correct, hash the new password
+          bcrypt.hash(newPassword, 10, (err, hashedNewPassword) => {
+              if (err) {
+                  return res.status(500).json({ success: false, message: 'Error hashing new password.' });
+              }
+
+              // Update the password in the database
+              const updateQuery = 'UPDATE voters SET password = ? WHERE nid_no = ?';
+              db.query(updateQuery, [hashedNewPassword, nid_no], (error) => {
+                  if (error) {
+                      return res.status(500).json({ success: false, message: 'Error updating password.' });
+                  }
+
+                  return res.json({ success: true, message: 'Password changed successfully.' });
+              });
+          });
+      });
+  });
+});
 // Start the server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
-
 
 
 
