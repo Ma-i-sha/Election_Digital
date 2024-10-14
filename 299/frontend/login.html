@@ -103,10 +103,10 @@
         <h2>Voter Login</h2>
         <form onsubmit="login(event)">
             <label for="nid_no">NID No</label>
-            <input type="text" id="nid_no" name="nid_no" required>
+            <input type="text" id="nid_no" name="nid_no"  required pattern="\d{10}" maxlength="10" title="Must be exactly 10 digits" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
 
             <label for="phone_number">Phone Number</label>
-            <input type="text" id="phone_number" name="phone_number" required pattern="\d{11}" maxlength="11" title="Must be exactly 11 digits">
+            <input type="text" id="phone_number" name="phone_number" required pattern="\d{11}" maxlength="11" title="Must be exactly 11 digits"  oninput="this.value=this.value.replace(/[^0-9]/g,'');">
 
             <label for="city">City</label>
 <select id="city" name="city" required style="width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; transition: border-color 0.2s ease;">
@@ -123,7 +123,7 @@
 
 
             <label for="ward">Ward</label>
-            <input type="text" id="ward" name="ward" required placeholder="Enter your ward number">
+            <input type="text" id="ward" name="ward" required pattern="\d{1,3}" maxlength="3" title="Must be 1 to 3 digits" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
 
             <label for="password">Password</label>
             <input type="password" id="password" name="password" required>
@@ -138,12 +138,12 @@
 
     <script>
         function login(event) {
-            event.preventDefault();  // Prevent form submission
+            event.preventDefault();  
 
             const nid_no = document.getElementById('nid_no').value.trim();
             const phone_number = document.getElementById('phone_number').value.trim();
             const city = document.getElementById('city').value;
-            const ward = document.getElementById('ward').value.trim();  // Get the ward value
+            const ward = document.getElementById('ward').value.trim();  
             const password = document.getElementById('password').value.trim();
 
             const loader = document.querySelector('.loader');
@@ -152,7 +152,7 @@
             // Validate form inputs
             if (!nid_no || !phone_number || !city || !ward || !password) {
                 alert('Please fill in all fields.');
-                loader.style.display = 'none';  // Hide loader on error
+                loader.style.display = 'none';  
                 return;
             }
 

@@ -7,221 +7,199 @@
     <style>
         
         body {
-            font-family: 'Helvetica Neue', sans-serif;
-            background-color: #e6e6e6;
-            margin: 0;
-            padding: 0;
-            overflow: hidden; 
-            height: 100vh; 
-        }
+    font-family: 'Helvetica Neue', sans-serif;
+    background-color: #e6e6e6;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100vh;
+}
 
-        .container {
-            width: 80%;
-            max-width: 1200px;
-            margin: 0 auto; 
-            background: #fff;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-wrap: wrap;
-            height: 100vh; 
-            overflow-y: auto; 
-            box-sizing: border-box; 
-            transition: all 0.3s ease-in-out;
-        }
+.container {
+    width: 80%;
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-wrap: wrap;
+    height: 100vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    position: relative;
+}
 
-        .container:hover {
-            transform: scale(1.02);
-            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
-        }
+.container:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+}
 
-        .header {
-            text-align: center;
-            width: 100%;
-            padding: 10px 0;
-            font-size: 2.5em;
-            color: #333;
-            letter-spacing: 1px;
-        }
+.header {
+    text-align: center;
+    width: 100%;
+    padding: 10px 0;
+    font-size: 2.5em;
+    color: #333;
+    letter-spacing: 1px;
+}
 
-        .profile-container {
-            display: flex;
-            flex-wrap: wrap;
-            width: 100%;
-            align-items: center;
-            justify-content: center; 
-        }
+.profile-container {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
 
-        .profile-pic {
-            text-align: center;
-            flex: 1;
-            max-width: 200px;
-            margin-right: 30px;
-        }
+.profile-pic {
+    text-align: center;
+    flex: 1;
+    max-width: 200px;
+    margin-right: 30px;
+}
 
-        .profile-pic img {
-            width: 160px;
-            height: 160px;
-            border-radius: 50%;
-            object-fit: cover;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
+.profile-pic img {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
 
-        .info-box {
-            flex: 3;
-            padding: 20px;
-            background-color: #fafafa;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            margin-top: auto;
-            margin-bottom: auto;
-            box-sizing: border-box;
-            width: 100%; 
-        }
+.info-box {
+    flex: 3;
+    padding: 20px;
+    background-color: #fafafa;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin-top: auto;
+    margin-bottom: auto;
+    box-sizing: border-box;
+    width: 100%;
+}
 
-        .info-header {
-            margin-bottom: 20px;
-        }
+.info-header {
+    margin-bottom: 20px;
+}
 
-        .info-header h2 {
-            color: #4CAF50;
-        }
+.info-header h2 {
+    color: #4CAF50;
+}
 
-        .info-content label {
-            display: block;
-            margin: 10px 0;
-            font-size: 1.1em;
-            font-weight: bold; 
-            text-transform: uppercase; 
-        }
+.info-content label {
+    display: block;
+    margin: 10px 0;
+    font-size: 1.1em;
+    font-weight: bold;
+    text-transform: uppercase;
+}
 
-        .info-content strong {
-            margin-right: 10px;
-        }
+.info-content strong {
+    margin-right: 10px;
+}
 
-        input[type="text"], input[type="date"], input[type="password"] {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            transition: border-color 0.3s;
-        }
+input[type="text"],
+input[type="date"],
+input[type="password"] {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    transition: border-color 0.3s;
+}
 
-        input:focus {
-            border-color: #4CAF50;
-            outline: none;
-        }
+input:focus {
+    border-color: #4CAF50;
+    outline: none;
+}
 
-        input[disabled] {
-            background-color: #f9f9f9;
-        }
+input[disabled] {
+    background-color: #f9f9f9;
+}
 
-        .btn-container {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 25px;
-            align-items: center; 
-        }
-
-        .btn {
-            padding: 12px 25px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s;
-        }
-
-        .btn:hover {
-            background-color: #45a049;
-        }
-
-        .btn.cancel {
-            background-color: #f44336;
-        }
-
-        .btn.cancel:hover {
-            background-color: #e53935;
-        }
-
-        .btn.delete {
-            background-color: #FF5722;
-        }
-
-        .btn.delete:hover {
-            background-color: #f4511e;
-        }
-        
-
-        .btn.update:disabled, .btn.delete:disabled, .btn.cancel:disabled {
-            background-color: grey;
-            cursor: not-allowed;
-        }
-
-        .candidate-link {
-            height: 30px;
-            margin-left: 20px; 
-            background-color: #4CAF50; 
-            color: white; 
-            padding: 10px 20px; 
-            border-radius: 5px; 
-            text-decoration: none; 
-            font-weight: bold; 
-            transition: background-color 0.3s; 
-        }
-
-        .candidate-link:hover {
-            background-color: #45a049; 
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-                height: auto; 
-                overflow-y: auto; 
-            }
-
-            .profile-pic {
-                margin-right: 0;
-                margin-bottom: 20px;
-                max-width: 100%;
-            }
-
-            .profile-container {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .info-box {
-                width: 100%;
-                padding: 15px;
-            }
-
-            .candidate-link {
-                margin-top: 20px; 
-                margin-left: 0; 
-            }
-        }
-        .btn-contain {
-    display: flex; 
-    justify-content: space-between; 
-    margin-top: 25px; 
-    align-items: center; 
+.btn-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 25px;
+    align-items: center;
 }
 
 .btn {
-    padding: 12px 25px; 
-    color: white; 
-    border: none; 
-    border-radius: 8px; 
-    cursor: pointer; 
-    font-size: 1em; 
-    transition: background-color 0.3s; 
+    padding: 12px 25px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #45a049;
+}
+
+.candidate-link,
+.vote-btn,
+#logoutButton {
+    display: block;
+    text-align: center;
+    padding: 10px 20px;
+    margin: 5px 0;
+    position: relative;
+    right: 10px;
+}
+
+.candidate-link {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.candidate-link:hover {
+    background-color: #45a049;
+}
+
+.vote-btn {
+    background-color: #FF9800;
+    color: white;
+    font-weight: bold;
+    font-size: 1em;
+    transition: background-color 0.3s;
+}
+
+.vote-btn:hover {
+    background-color: #FB8C00;
+}
+
+#logoutButton {
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s;
+    position: absolute;
+    bottom: 20px;
+    right: 10px;
+}
+
+#logoutButton:hover {
+    background-color: darkred;
+}
+
+.btn-contain {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 25px;
+    align-items: center;
 }
 
 .btn.change-password {
@@ -229,44 +207,70 @@
 }
 
 .btn.change-password:hover {
-    background-color: #45a049; 
+    background-color: #45a049;
 }
 
 .btn.logout {
-    background-color: #f44336; 
+    background-color: #f44336;
 }
 
 .btn.logout:hover {
-    background-color: #e53935; 
+    background-color: #e53935;
 }
 
 .btn:disabled {
-    background-color: grey; 
-    cursor: not-allowed; 
-}
-body {
-    
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f0f0f0;
+    background-color: grey;
+    cursor: not-allowed;
 }
 
-#logoutButton {
-    height: 50px;
+.top-right-buttons {
+    position: absolute;
+    top: 10px; /* Adjust as needed */
+    right: 10px;
+    display: 30px;
+    flex-direction: column;
+    align-items: flex-end;
+    padding-top: 50px; /* Padding at the top */
+    padding-bottom: 50px; /* Padding at the bottom */
+}
+
+.top-right-buttons .candidate-link,
+.top-right-buttons .vote-btn,
+.top-right-buttons #logoutButton {
+    margin: 5px 0;
     padding: 10px 20px;
-    font-size: 16px;
-    color: white;
-    background-color: red;
-    border: none;
+    text-align: center;
+    font-size: 0.9em;
     border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
 }
 
-#logoutButton:hover {
-    background-color: darkred;
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+        height: auto;
+        overflow-y: auto;
+    }
+
+    .profile-pic {
+        margin-right: 0;
+        margin-bottom: 20px;
+        max-width: 100%;
+    }
+
+    .profile-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .info-box {
+        width: 100%;
+        padding: 15px;
+    }
+
+    .top-right-buttons {
+        top: 10px;
+        right: 10px;
+    }
 }
 
 
@@ -274,14 +278,21 @@ body {
     </style>
 </head>
 <body>
-
+    <div class="top-right-buttons">
+        <a href="/view_candidate.html" class="candidate-link">Candidate List</a>
+        <br><br>
+        <a href="vote.html" class="vote-btn">Vote</a>
+        <br><br>
+        <button id="logoutButton">Logout</button>
+    </div>
     <div class="container">
         <div class="header">
             <h1>Voter Profile</h1>
         </div>
+        
 
         <div class="profile-pic">
-            <img id="currentProfilePicture" src="http://localhost:3000/uploads/1728153031702.jpg" alt="Profile Picture" style="width:150px; height:150px; border-radius:50%;" />
+            <img id="currentProfilePicture" src="" alt="Profile Picture" style="width:150px; height:150px; border-radius:50%;" />
         </div>
 
         <div class="info-box">
@@ -341,13 +352,21 @@ body {
                 <button class="btn change-password" id="changePasswordButton">Change Password</button> 
             </div>
         </div>
-        <a href="/view_candidate.html" class="candidate-link">Candidate List</a>
-        <button id="logoutButton">Logout</button>
+        
+
     
     </div>
     
 
     <script>
+        // Check if nid_no exists in localStorage
+        const nidNo = localStorage.getItem('nid_no');
+
+        if (!nidNo) {
+            // Redirect to home_page.html if no nid_no is found
+            window.location.href = 'home_page.html';
+        } 
+
         // Attach event listener to change password button
         document.getElementById('changePasswordButton').addEventListener('click', () => {
             window.location.href = 'change_password.html';
@@ -355,18 +374,15 @@ body {
 
         // Attach event listener to logout button
         document.getElementById('logoutButton').addEventListener('click', function() {
-    // Clear all items from localStorage
-    localStorage.clear();
+            // Clear all items from localStorage
+            localStorage.clear();
 
-    // Redirect to home_page.html
-    window.location.href = 'home_page.html';
-});
-
+            // Redirect to home_page.html
+            window.location.href = 'home_page.html';
+        });
 
         // Fetch user data based on nid_no
         window.onload = function() {
-            const nidNo = localStorage.getItem('nid_no');
-
             if (nidNo) {
                 fetch('http://localhost:3000/home_page/nid', {  
                     method: 'POST',

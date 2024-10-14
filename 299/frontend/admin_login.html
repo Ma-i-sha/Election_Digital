@@ -70,7 +70,7 @@
     <div class="container">
         <h2>Administrator Login</h2>
         <form id="loginForm">
-            <input type="text" id="admin_id" placeholder="Admin ID" required>
+            <input type="text" id="admin_id" placeholder="Admin ID" required pattern="\d{10}" maxlength="10" title="Must be exactly 10 digits" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
             <input type="password" id="password" placeholder="Password" required>
             <button type="submit">Login</button>
             <div class="error" id="errorMsg"></div>

@@ -133,7 +133,8 @@
         <div class="left_area">
             <h3>Election Management</h3>
         </div>
-        <button class="logout_btn" onclick="logout()">Logout</button>
+        <a href="#" class="logout_btn" id="logoutButton">Logout</a>
+
     </header>
 
     <div class="sidebar">
@@ -162,6 +163,10 @@
     </div>
 
     <script>
+        if (!localStorage.getItem('admin_id')) {
+    // Redirect to home_page.html if no admin_id is found
+    window.location.href = 'home_page.html';
+}
       // Fetch candidate count
 fetch('http://localhost:3000/candidate_count', {
     method: 'POST',
@@ -198,10 +203,13 @@ fetch('http://localhost:3000/voter_count', {
 
         
     
-        function logout() {
-            alert('Logging out...');
-            
-        }
+    document.getElementById('logoutButton').addEventListener('click', function() {
+    // Clear all items from localStorage
+    localStorage.clear();
+
+    // Redirect to home_page.html
+    window.location.href = 'home_page.html';
+});
     </script>
 </body>
 </html>

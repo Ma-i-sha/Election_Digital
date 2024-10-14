@@ -195,7 +195,7 @@ input[disabled] {
         </div>
 
         <div class="profile-pic">
-            <img id="currentProfilePicture" src="http://localhost:3000/uploads/1728153031702.jpg" alt="Profile Picture" style="width:150px; height:150px; border-radius:50%;" />
+            <img id="currentProfilePicture" src="" alt="Profile Picture" >
 
 
         </div>
@@ -204,6 +204,7 @@ input[disabled] {
             <div class="info-header">
                 <h2>Information</h2>
             </div>
+            
 
             <div class="info-content">
                 
@@ -266,13 +267,19 @@ input[disabled] {
                 <button class="btn update" disabled>Update Profile</button>
                 <button class="btn delete" disabled>Delete</button>
                 <button class="btn cancel" disabled>Cancel</button>
-                <button class="btn change-password" disabled>Change Password</button> <!-- Added Change Password button -->
+                
+                    <button class="btn change-password" disabled id="changePasswordButton">Change Password</button> 
+               
 
             </div>
         </div>
     </div>
 
     <script>
+         document.getElementById('changePasswordButton').addEventListener('click', () => {
+            window.location.href = 'admin_change_password.html';
+        });
+
          const inputs = document.querySelectorAll('input');
         const enableButton = document.querySelector('.enable');
         const updateButton = document.querySelector('.update');
@@ -299,7 +306,7 @@ input[disabled] {
             });
         });
         changePasswordButton.addEventListener('click', () => {
-            window.location.href = 'change_password.html';
+            window.location.href = 'admin_change_password.html';
         });
 
 
@@ -347,10 +354,7 @@ input[disabled] {
                 if (userData.profile_picture) {
                     // If profile picture exists, update the img src
                     profilePictureElement.src = `http://localhost:3000/${userData.profile_picture}`;
-                } else {
-                    // Provide a default image in case no profile picture exists
-                    profilePictureElement.src = '/path/to/default/image.jpg';  // Replace with an actual path to a default image
-                }
+                } 
 
                  
             } else {
