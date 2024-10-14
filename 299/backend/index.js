@@ -17,6 +17,7 @@ const bcrypt = require('bcrypt');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
+const sqlite3 = require('sqlite3').verbose();
 
 const app = express();
 const port = 3000;
@@ -63,6 +64,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Serve u
 
 // Registration route
 // Registration route
+app.use('/uploads', express.static('uploads'));
+
 app.post('/add_voter', upload.single('profile_picture'), (req, res) => {
   const {
     fname,
@@ -181,67 +184,52 @@ app.post('/user_check', (req, res) => {
 
 
 
-app.post('/update_user', upload.single('profile_picture'), async (req, res) => {
-    const { 
-        fname, 
-        father_name, 
-        mother_name, 
-        nid_no, 
-        phone_number,
-        dob, 
-        blood_group, 
-        home, 
-        ward, 
-        post_office, 
-        postal_code, 
-        city, 
-        country, 
-        new_password 
-    } = req.body;
+app.post('/update_user', upload.single('profile_picture'), (req, res) => {
+  const { 
+      fname, 
+      father_name, 
+      mother_name, 
+      nid_no, 
+      phone_number, 
+      dob, 
+      blood_group, 
+      home, 
+      ward, 
+      post_office, 
+      postal_code, 
+      city, 
+      country 
+  } = req.body;
 
-    console.log('Received new password:', new_password);  // Check if the password is received
+  const profilePicturePath = req.file ? req.file.filename : null;
 
-    const profilePicturePath = req.file ? req.file.filename : null;
+  let query = `
+      UPDATE voter SET fname = ?, father_name = ?, mother_name = ?, dob = ?, 
+      blood_group = ?, phone_number = ?, home = ?, ward = ?, post_office = ?, postal_code = ?, 
+      city = ?, country = ? ${profilePicturePath ? ', profile_picture = ?' : ''}
+  `;
 
-    let query = `
-        UPDATE voter SET fname = ?, father_name = ?, mother_name = ?, dob = ?, 
-        blood_group = ?,phone_number = ?, home = ?, ward = ?, post_office = ?, postal_code = ?, 
-        city = ?, country = ? ${profilePicturePath ? ', profile_picture = ?' : ''} 
-    `;
+  const values = [fname, father_name, mother_name, dob, blood_group, phone_number, home, ward, post_office, postal_code, city, country];
 
-    const values = [fname, father_name, mother_name, dob, blood_group,phone_number, home, ward, post_office, postal_code, city, country];
+  if (profilePicturePath) {
+      values.push(profilePicturePath);
+  }
 
-    // Hash new password if provided
-    if (new_password) {
-        try {
-            const hashedPassword = await bcrypt.hash(new_password, 10);
-            console.log('Hashed password:', hashedPassword);  // Check if hashing works
-            query += `, password = ?`;
-            values.push(hashedPassword);
-        } catch (err) {
-            console.error('Error hashing password:', err);
-            return res.status(500).json({ error: 'Password hashing error' });
-        }
-    }
+  query += ` WHERE nid_no = ?`;
+  values.push(nid_no);
 
-    if (profilePicturePath) {
-        values.push(profilePicturePath);
-    }
+  console.log('Query:', query);  // Log the query
+  console.log('Values:', values);  // Log the values
 
-    query += ` WHERE nid_no = ?`;
-    values.push(nid_no);
-
-    console.log('Query:', query);  // Log the query
-    console.log('Values:', values);  // Log the values
-
-    db.query(query, values, (err, result) => {
-        if (err) {
-            console.error('Database update error:', err);
-            return res.status(500).json({ error: 'Database update error' });
-        }
-        return res.json({ success: true });
-    });
+  db.query(query, values, (err, result) => {
+      if (err) {
+          console.error('Database update error:', err);
+          return res.status(500).json({ error: 'Database update error' });
+      }
+      return res.json({ success: true });
+  });
 });
+
 
 
 // Get user data by NID
@@ -409,14 +397,21 @@ app.post('/get_voters', (req, res) => {
       }
   });
 });
-
+app.use('/uploads', express.static('uploads'));
 app.post('/add_candidate', upload.single('profile_picture'), (req, res) => {
   const { nid_no, fname, lname, ward, city } = req.body;
-  const profilePicture = req.file ? req.file.filename : null;  // Get uploaded file name
 
-  // Check if all fields are provided
+  // Check if all required fields are provided
   if (!nid_no || !fname || !lname || !ward || !city) {
-    return res.status(400).json({ error: 'All fields are required' });
+    return res.status(400).json({ error: 'Please fill in all required fields.' });
+  }
+
+  // Check if profile picture was uploaded
+  let profile_picture;
+  if (req.file) {
+    profile_picture = req.file.path; // Store the file path of the uploaded profile picture
+  } else {
+    return res.status(400).json({ error: 'Please upload a profile picture.' });
   }
 
   // Query to check if the NID is already registered
@@ -430,7 +425,7 @@ app.post('/add_candidate', upload.single('profile_picture'), (req, res) => {
 
     // If the NID already exists, return an error
     if (results.length > 0) {
-      return res.status(400).json({ error: 'NID number already registered' });
+      return res.status(400).json({ error: 'National ID number already registered.' });
     }
 
     // Insert the new candidate into the database
@@ -439,82 +434,92 @@ app.post('/add_candidate', upload.single('profile_picture'), (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(insertQuery, [nid_no, fname, lname, ward, city, profilePicture], (err, result) => {
+    const values = [nid_no, fname, lname, ward, city, profile_picture];
+
+    db.query(insertQuery, values, (err, result) => {
       if (err) {
         console.error('Error while registering candidate:', err);
         return res.status(500).json({ error: 'Failed to register candidate' });
       }
 
       // Respond with a success message
-      res.json({ message: 'Candidate registered successfully!' });
+      res.status(201).json({ message: 'Candidate registered successfully!' });
     });
   });
 });
 
 
-
 app.get('/candidate', (req, res) => {
   res.json(candidate);
 });
+app.use('/uploads', express.static('uploads'));  // Assuming images are stored in 'uploads' directory
 
 app.post('/candidate/get_candidate', (req, res) => {
-  const candidateId = req.body.id;
+  const { id } = req.body;
 
-  if (!candidateId) {
-      return res.status(400).send({ message: 'Candidate ID is required' });
+  if (!id) {
+    return res.status(400).send({ message: 'Candidate ID is required' });
   }
 
-  const sql = 'SELECT * FROM candidate WHERE nid_no = ?';
-  db.query(sql, [candidateId], (err, result) => {
-      if (err) {
-          console.error('Error fetching candidate data:', err);
-          return res.status(500).send({ message: 'Error fetching candidate data' });
-      }
+  console.log(`Received Candidate ID: ${id}`);
 
-      if (result.length > 0) {
-          res.send({ result: result[0] });
-      } else {
-          res.send({ message: 'No candidate found' });
-      }
+  const query = `SELECT fname, lname, nid_no, ward, city, profile_picture 
+                 FROM candidate WHERE nid_no = ?`;
+
+  db.query(query, [id], (err, result) => {
+    if (err) {
+      console.error('Error fetching candidate data:', err);
+      return res.status(500).send({ message: 'Error fetching candidate data' });
+    }
+
+    if (result.length === 0) {
+      console.log('No candidate found for the provided ID');
+      return res.status(404).send({ message: 'Candidate not found' });
+    }
+
+    console.log('Query result:', result);  // Logging the query result
+    console.log('First result:', result[0]);  // Logging the first object in the result array
+
+    // Prepare the response object
+    const candidateResponse = {
+      fname: result[0].fname,
+      lname: result[0].lname,
+      nid_no: result[0].nid_no,
+      ward: result[0].ward,
+      city: result[0].city,
+      profile_picture: result[0].profile_picture
+    };
+
+    return res.send({ result: candidateResponse });  // Sending the response to the front-end
   });
 });
+
+
+
 
 // API to update candidate data
 app.post('/candidate/update_candidate', upload.single('profile_picture'), async (req, res) => {
-  const { id, fname, lname, nid_no, ward, city, new_password } = req.body;
+  const { id, fname, lname, ward, city } = req.body; // Removed 'nid_no' from here
 
   if (!id) {
-      return res.status(400).send({ message: 'Candidate ID is required' });
+    return res.status(400).send({ message: 'Candidate ID is required' });
   }
 
-  let query = `UPDATE candidate SET fname = ?, lname = ?, nid_no = ?, ward = ?, city = ?`;
-  const values = [fname, lname, nid_no, ward, city];
-
-  // Handle profile picture upload
-  if (req.file) {
-      query += ', profile_picture = ?';
-      values.push(req.file.filename);
-  }
-
-  // Handle new password if provided
-  if (new_password) {
-      const hashedPassword = await bcrypt.hash(new_password, 10);
-      query += ', password = ?';
-      values.push(hashedPassword);
-  }
-
-  query += ' WHERE nid_no = ?';
-  values.push(id);
+  // Updating candidate without modifying nid_no
+  let query = `UPDATE candidate SET fname = ?, lname = ?, ward = ?, city = ? WHERE nid_no = ?`; // Use 'id' for WHERE clause
+  const values = [fname, lname, ward, city, id]; // Use the 'id' at the end
 
   db.query(query, values, (err, result) => {
-      if (err) {
-          console.error('Error updating candidate:', err);
-          return res.status(500).send({ message: 'Error updating candidate' });
-      }
+    if (err) {
+      console.error('Error updating candidate:', err);
+      return res.status(500).send({ message: 'Error updating candidate' });
+    }
 
-      res.send({ success: true, message: 'Candidate updated successfully' });
+    res.send({ success: true, message: 'Candidate updated successfully' });
   });
 });
+
+
 
 // API to delete candidate data
 app.delete('/candidate/delete_candidate', (req, res) => {
@@ -605,32 +610,44 @@ app.post('/search_candidate', (req, res) => {
 });
 
 app.post('/view_candidates', (req, res) => {
-  const { ward, city } = req.body; // Destructure ward and city from request body
+  const { ward, city } = req.body;
 
-  // Check if ward and city are provided
   if (!ward || !city) {
-    return res.status(400).json({ error: 'Ward and city are required' });
+    return res.status(400).send({ message: 'Ward and city are required' });
   }
 
-  // Query to select candidates filtered by ward and city
-  const query = 'SELECT * FROM candidate WHERE ward = ? AND city = ?';
-  
-  // Execute the query with ward and city values as parameters
+  console.log(`Received Ward: ${ward}, City: ${city}`);
+
+  const query = `SELECT fname, lname, nid_no, ward, city, profile_picture 
+                 FROM candidate WHERE ward = ? AND city = ?`;
+
   db.query(query, [ward, city], (err, results) => {
     if (err) {
-      console.error('Error fetching data:', err);
-      return res.status(500).json({ error: 'Database query failed' });
-    }
-    
-    // If no candidates found, send an appropriate message
-    if (results.length === 0) {
-      return res.status(404).json({ result: [], message: 'No candidates found for the selected ward and city.' });
+      console.error('Error fetching candidates:', err);
+      return res.status(500).send({ message: 'Error fetching candidates' });
     }
 
-    // Send the filtered results as JSON
-    res.json({ result: results });
+    if (results.length === 0) {
+      console.log('No candidates found for the provided ward and city');
+      return res.status(404).send({ message: 'No candidates found' });
+    }
+
+    console.log('Query results:', results);  // Logging the full query results
+
+    // Prepare the response object with a map over the results array
+    const candidatesResponse = results.map(candidate => ({
+      fname: candidate.fname,
+      lname: candidate.lname,
+      nid_no: candidate.nid_no,
+      ward: candidate.ward,
+      city: candidate.city,
+      profile_picture: candidate.profile_picture
+    }));
+
+    return res.send({ result: candidatesResponse });  // Sending the list of candidates to the front-end
   });
 });
+
 
 app.post('/api/voters/change-password', (req, res) => {
   const { nid_no, oldPassword, newPassword } = req.body;
@@ -641,7 +658,7 @@ app.post('/api/voters/change-password', (req, res) => {
   }
 
   // Fetch the user's hashed password
-  const query = 'SELECT password FROM voters WHERE nid_no = ?';
+  const query = 'SELECT password FROM voter WHERE nid_no = ?';
   db.query(query, [nid_no], (error, results) => {
       if (error) {
           return res.status(500).json({ success: false, message: 'Database error.' });
@@ -669,7 +686,7 @@ app.post('/api/voters/change-password', (req, res) => {
               }
 
               // Update the password in the database
-              const updateQuery = 'UPDATE voters SET password = ? WHERE nid_no = ?';
+              const updateQuery = 'UPDATE voter SET password = ? WHERE nid_no = ?';
               db.query(updateQuery, [hashedNewPassword, nid_no], (error) => {
                   if (error) {
                       return res.status(500).json({ success: false, message: 'Error updating password.' });
@@ -681,11 +698,43 @@ app.post('/api/voters/change-password', (req, res) => {
       });
   });
 });
+
+app.post('/vote', async (req, res) => {
+  const { nidNos } = req.body; // Extract nidNos from the request body
+
+  // Log the nidNos received from the frontend
+  console.log('Received nidNos from frontend:', nidNos);
+
+  // Check if nidNos is valid (exists and is not empty)
+  if (!nidNos || nidNos.length === 0) {
+      return res.status(400).json({ message: 'No candidates selected.' });
+  }
+
+  try {
+      // Prepare a SQL query to update the vote count for all selected candidates
+      const placeholders = nidNos.map(() => '?').join(','); // Create placeholders for SQL
+      const sql = `UPDATE candidate SET vote_count = vote_count + 1 WHERE nid_no IN (${placeholders})`;
+
+      // Execute the query with the array of nidNos
+      const result = await db.query(sql, nidNos);
+
+      // Log the result of the query
+      // console.log('Query result:', result);
+
+      // Respond with success message if vote count is updated
+      res.json({ message: 'Vote successfully recorded.' });
+  } catch (err) {
+      console.error('Error updating vote count:', err);
+      res.status(500).json({ message: 'Error updating vote count.' });
+  }
+});
+
+
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
-
 
 
 
