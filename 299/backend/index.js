@@ -452,6 +452,29 @@ app.post('/add_candidate', upload.single('profile_picture'), (req, res) => {
 app.get('/candidate', (req, res) => {
   res.json(candidate);
 });
+app.get('/candidateinfo', (req, res) => {
+  // Get the ward_id from the request query parameters
+  const wardId = req.query.ward_id;
+
+  // Prepare the query with a WHERE clause to filter by ward_id
+  const query = 'SELECT id, nid_no, fname, lname, ward, city, profile_picture, vote_count FROM candidate WHERE ward = ?';
+
+  // Execute the query, passing in the wardId to replace the placeholder (?)
+  db.query(query, [wardId], (err, results) => {
+    if (err) {
+      console.error('Error executing query: ', err);
+      return res.status(500).json({ error: 'Database query failed' });
+    }
+
+    // If no candidates are found, return a message indicating that
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'No candidates found for this ward' });
+    }
+
+    // Send the matching results back as JSON
+    res.json(results);
+  });
+});
 app.use('/uploads', express.static('uploads'));  // Assuming images are stored in 'uploads' directory
 
 app.post('/candidate/get_candidate', (req, res) => {

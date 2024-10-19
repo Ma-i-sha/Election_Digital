@@ -46,7 +46,7 @@
             
             const ward = localStorage.getItem('ward');
             const city = localStorage.getItem('city');
-
+            console.log(ward +" " + city);
             
             if (!ward || !city) {
                 console.error('Ward and city not found in localStorage');
@@ -79,6 +79,7 @@
                 }
 
                 data.result.forEach(candidate => { 
+                    console.log(candidate);
                     const card = document.createElement('div');
                     card.classList.add('profile-card');
 
