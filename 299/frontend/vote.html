@@ -73,10 +73,12 @@
         window.onload = function() {
             const ward = localStorage.getItem('ward');
             const city = localStorage.getItem('city');
-            const nid_no = localStorage.getItem('nid_no');  
+            const voterNID = localStorage.getItem('nid_no');  
         
-            if (!ward || !city || !nid_no) {
+            if (!ward || !city || !voterNID) {
                 console.error('Ward, city, or nid_no not found in localStorage');
+                alert('An error occurred. Please log in again.');
+                window.location.href = 'login.html'; // Redirect to login if data is missing
                 return;
             }
 
@@ -112,7 +114,7 @@
                 body: JSON.stringify({
                     ward: ward,
                     city: city,
-                    nid_no: nid_no  // Send nid_no to backend
+                    nid_no: voterNID
                 })
             })
             .then(res => res.json())
@@ -156,12 +158,10 @@
     
                     // Handle card selection (single selection)
                     card.onclick = function() {
-                        // Deselect any previously selected card
                         const previouslySelectedCard = document.querySelector('.profile-card.selected');
                         if (previouslySelectedCard) {
                             previouslySelectedCard.classList.remove('selected');
                         }
-                        // Select the current card
                         this.classList.add('selected');
                     };
                 });
@@ -176,9 +176,9 @@
                     alert('Please select a candidate to vote.');
                     return;
                 }
-    
-                const selectedNID = selectedCard.dataset.nidNo; 
-    
+
+                const selectedNID = selectedCard.dataset.nidNo;
+
                 // Send the selected candidate's NID and the user's NID to the backend
                 fetch('http://localhost:3000/vote', {
                     method: 'POST',
@@ -186,8 +186,8 @@
                         'Accept': 'application/json, text/plain, */*',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ 
-                        voter_nid_no: nid_no,  
+                    body: JSON.stringify({
+                        voter_nid_no: voterNID, 
                         candidate_nid_no: selectedNID  
                     })
                 })
@@ -197,9 +197,14 @@
                     if (data.message === 'Vote successfully recorded.') {
                         localStorage.clear();  
                         window.location.href = 'home_page.html';
+                    } else {
+                        alert(data.message); // Alert if there is any error in the response message
                     }
                 })
-                .catch(error => console.error('Error voting:', error));
+                .catch(error => {
+                    console.error('Error voting:', error);
+                    alert('An error occurred while voting. Please try again.');
+                });
             };
         };
     </script>

@@ -139,63 +139,66 @@
 
     <script>
         function login(event) {
-            event.preventDefault();  
-    
-            const nid_no = document.getElementById('nid_no').value.trim();
-            const phone_number = document.getElementById('phone_number').value.trim();
-            const city = document.getElementById('city').value;
-            const ward = document.getElementById('ward').value.trim();  
-            const password = document.getElementById('password').value.trim();
-    
-            const loader = document.querySelector('.loader');
-            loader.style.display = 'block';  
-    
-            // Validate form inputs
-            if (!nid_no || !phone_number || !city || !ward || !password) {
-                alert('Please fill in all fields.');
-                loader.style.display = 'none';  
-                return;
+    event.preventDefault();
+
+    const nid_no = document.getElementById('nid_no').value.trim();
+    const phone_number = document.getElementById('phone_number').value.trim();
+    const city = document.getElementById('city').value;
+    const ward = document.getElementById('ward').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    const loader = document.querySelector('.loader');
+    loader.style.display = 'block';
+
+    if (!nid_no || !phone_number || !city || !ward || !password) {
+        alert('Please fill in all fields.');
+        loader.style.display = 'none';
+        return;
+    }
+
+    const user = { nid_no, phone_number, city, ward, password };
+
+    fetch('http://localhost:3000/user_check', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(user)
+    })
+    .then(res => res.json())
+    .then(res => {
+        loader.style.display = 'none';
+
+        if (res.vote_status === 1) {
+            if (res.result_published) {
+                window.localStorage.setItem('nid_no', nid_no);
+            window.localStorage.setItem('user', JSON.stringify(res.user));
+            window.localStorage.setItem('city', city);
+            window.localStorage.setItem('ward', ward);
+                window.location.href = './result.html';
+            } else {
+                alert('User has already voted, but result is not published.');
             }
-    
-            const user = { nid_no, phone_number, city, ward, password };  
-    
-            // Send user credentials to the server
-            fetch('http://localhost:3000/user_check', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json, text/plain, */*',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(user)
-            })
-            .then(res => res.json())
-            .then(res => {
-                loader.style.display = 'none';  
-    
-                // Check if the user has already voted
-                if (res.vote_status === 1) {
-                    // Redirect to the results page if the user has already voted
-                    window.location.href = './result.html';
-                } else if (res.message === "Login successful") {
-                    // Save user data to localStorage if the login was successful and the user hasn't voted
-                    window.localStorage.setItem('nid_no', nid_no);
-                    window.localStorage.setItem('user', JSON.stringify(res.user));
-                    window.localStorage.setItem('city', city);  
-                    window.localStorage.setItem('ward', ward);  
-    
-                    // Redirect to the dashboard
-                    window.location.href = './dashboard.html';
-                } else {
-                    
-                    alert(res.error || 'Unknown error occurred.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                loader.style.display = 'none';  
-                alert('An error occurred while processing your request.');
-            });
+        } else if (res.message === "Login successful") {
+            window.localStorage.setItem('nid_no', nid_no);
+            window.localStorage.setItem('user', JSON.stringify(res.user));
+            window.localStorage.setItem('city', city);
+            window.localStorage.setItem('ward', ward);
+
+            window.location.href = './dashboard.html';
+        } else {
+            alert(res.error || 'Unknown error occurred.');
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        loader.style.display = 'none';
+        alert('An error occurred while processing your request.');
+    });
+}
+
+
     </script>
     
 

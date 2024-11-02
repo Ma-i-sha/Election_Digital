@@ -56,16 +56,18 @@
         }
     
         .sidebar {
-            position: fixed;
-            left: 0;
-            top: 70px;
-            background: #2f323a;
-            padding-top: 30px;
-            width: 250px;
-            height: calc(100% - 70px); 
-            z-index: 999;
-        }
-    
+    position: fixed;
+    left: 0;
+    top: 70px;
+    background: #2f323a;
+    padding-top: 30px;
+    width: 250px;
+    height: calc(100% - 70px); 
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
         .sidebar a {
             color: #fff;
             display: block;
@@ -125,8 +127,19 @@
         .card:hover {
             transform: scale(1.05);
         }
+
+        .publish_btn {
+    background-color: red;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    margin: 20px 20px 50px 20px; 
+    border-radius: 5px;
+}
     </style>
-    
 </head>
 
 <body>
@@ -135,82 +148,72 @@
             <h3>Election Management</h3>
         </div>
         <a href="#" class="logout_btn" id="logoutButton">Logout</a>
-
     </header>
 
     <div class="sidebar">
-        <h3>Candidate</h3>
-        <a href="candidate_list.html">Candidate List</a>
-        <a href="add_candidate.html">Add New Candidate</a>
-        <a href="search_candidate.html">Change Candidate Info</a>
-        <h3>Voter</h3>
-        <a href="voter_list.html">Voter List</a>
-        <a href="add_voter.html">Add Voter</a>
-        <a href="Search_voter.html">Change Voter Info</a>
+        <div>
+            <h3>Candidate</h3>
+            <a href="candidate_list.html">Candidate List</a>
+            <a href="add_candidate.html">Add New Candidate</a>
+            <a href="search_candidate.html">Change Candidate Info</a>
+            <h3>Voter</h3>
+            <a href="voter_list.html">Voter List</a>
+            <a href="add_voter.html">Add Voter</a>
+            <a href="Search_voter.html">Change Voter Info</a>
+        </div>
+        <button class="publish_btn" id="publishResultButton">PUBLISH RESULT</button>
     </div>
 
     <div class="content">
         <h1 class="word">Admin Dashboard</h1>
         <div class="card-container">
             <div class="card">
-                
-                <p>Total Voter <br>  <span id="voterCount"></span></p>
+                <p>Total Voter <br> <span id="voterCount"></span></p>
             </div>
             <div class="card">
-                
-                <p>Total Candidate  <br> <span id="candidateCount"></span></p>
+                <p>Total Candidate <br> <span id="candidateCount"></span></p>
             </div>
         </div>
     </div>
 
     <script>
         if (!localStorage.getItem('admin_id')) {
-    // Redirect to home_page.html if no admin_id is found
-    window.location.href = 'home_page.html';
-}
-      // Fetch candidate count
-fetch('http://localhost:3000/candidate_count', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-})
-    .then(res => res.json())
-    .then(data => {
-        if (data.status === 'success') {
-            document.getElementById('candidateCount').textContent = data.count;
-        } else {
-            console.error('Error fetching candidate count:', data.message);
+            window.location.href = 'home_page.html';
         }
-    })
-    .catch(error => console.error('Error fetching candidate count:', error));
 
-// Fetch voter count
-fetch('http://localhost:3000/voter_count', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-})
-    .then(res => res.json())
-    .then(data => {
-        if (data.status === 'success') {
-            document.getElementById('voterCount').textContent = data.count;
-        } else {
-            console.error('Error fetching voter count:', data.message);
-        }
-    })
-    .catch(error => console.error('Error fetching voter count:', error));
+        // Fetch candidate and voter counts
+        fetch('http://localhost:3000/candidate_count', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+            .then(res => res.json())
+            .then(data => document.getElementById('candidateCount').textContent = data.status === 'success' ? data.count : 'Error')
+            .catch(error => console.error('Error fetching candidate count:', error));
 
-        
-    
-    document.getElementById('logoutButton').addEventListener('click', function() {
-    // Clear all items from localStorage
-    localStorage.clear();
+        fetch('http://localhost:3000/voter_count', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+            .then(res => res.json())
+            .then(data => document.getElementById('voterCount').textContent = data.status === 'success' ? data.count : 'Error')
+            .catch(error => console.error('Error fetching voter count:', error));
 
-    // Redirect to home_page.html
-    window.location.href = 'home_page.html';
-});
+        // Logout functionality
+        document.getElementById('logoutButton').addEventListener('click', function() {
+            localStorage.clear();
+            window.location.href = 'home_page.html';
+        });
+
+        // Publish Result functionality
+        document.getElementById('publishResultButton').addEventListener('click', function() {
+            fetch('http://localhost:3000/publish_result', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Result published successfully');
+                } else {
+                    alert('Failed to publish result');
+                }
+            })
+            .catch(error => console.error('Error publishing result:', error));
+        });
     </script>
 </body>
 </html>
