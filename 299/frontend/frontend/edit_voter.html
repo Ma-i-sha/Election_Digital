@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter Profile</title>
+    <style>
+        
+body {
+    background-image: url('./images/299.jpeg');
+    font-family: 'Helvetica Neue', sans-serif;
+    background-color: #e6e6e6;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; 
+    height: 100vh; 
+}
+
+.container {
+    width: 80%;
+    max-width: 1200px;
+    margin: 0 auto; 
+    background: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-wrap: wrap;
+    height: 100vh; 
+    overflow-y: auto; 
+    box-sizing: border-box; 
+    transition: all 0.3s ease-in-out;
+}
+
+.container:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+}
+
+.header {
+    text-align: center;
+    width: 100%;
+    padding: 10px 0;
+    font-size: 2.5em;
+    color: #333;
+    letter-spacing: 1px;
+}
+
+.profile-container {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    align-items: center;
+    justify-content: center; 
+}
+
+.profile-pic {
+    text-align: center;
+    flex: 1;
+    max-width: 200px;
+    margin-right: 30px;
+}
+
+.profile-pic img {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.info-box {
+    flex: 3;
+    padding: 20px;
+    background-color: #fafafa;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin-top: auto;
+    margin-bottom: auto;
+    box-sizing: border-box;
+    width: 100%; 
+}
+
+.info-header {
+    margin-bottom: 20px;
+}
+
+.info-header h2 {
+    color: #4CAF50;
+}
+
+.info-content label {
+    display: block;
+    margin: 10px 0;
+    font-size: 1.1em;
+    font-weight: bold; 
+    text-transform: uppercase; 
+}
+
+.info-content strong {
+    margin-right: 10px;
+}
+
+input[type="text"], input[type="date"], input[type="password"] {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    transition: border-color 0.3s;
+}
+
+input:focus {
+    border-color: #4CAF50;
+    outline: none;
+}
+
+input[disabled] {
+    background-color: #f9f9f9;
+}
+
+.btn-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 25px;
+}
+
+.btn {
+    padding: 12px 25px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #45a049;
+}
+
+.btn.cancel {
+    background-color: #f44336;
+}
+
+.btn.cancel:hover {
+    background-color: #e53935;
+}
+
+.btn.delete {
+    background-color: #FF5722;
+}
+
+.btn.delete:hover {
+    background-color: #f4511e;
+}
+
+.btn.update:disabled, .btn.delete:disabled, .btn.cancel:disabled {
+    background-color: grey;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+        height: auto; 
+        overflow-y: auto; 
+    }
+
+    .profile-pic {
+        margin-right: 0;
+        margin-bottom: 20px;
+        max-width: 100%;
+    }
+
+    .profile-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .info-box {
+        width: 100%;
+        padding: 15px;
+    }
+}
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Voter Profile</h1>
+        </div>
+
+        <div class="profile-pic">
+            <img id="currentProfilePicture" src="" alt="Profile Picture" >
+
+
+        </div>
+
+        <div class="info-box">
+            <div class="info-header">
+                <h2>Information</h2>
+            </div>
+            
+
+            <div class="info-content">
+                
+            
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>FIRST NAME:</strong> <input type="text" id="fname" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>LAST NAME:</strong> <input type="text" id="lname" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>ID:</strong> <input type="text" id="id_no" disabled style="text-transform: uppercase;">
+                </label>
+                
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>PHONE NUMBER:</strong> <input type="text" id="phone_number" disabled style="text-transform: uppercase;">
+                </label>
+
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>FATHER NAME:</strong> <input type="text" id="father_name" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>MOTHER NAME:</strong> <input type="text" id="mother_name" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>NID NO:</strong> <input type="text" id="nid_no" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>DOB:</strong> <input type="date" id="dob" disabled>
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>BLOOD GROUP:</strong> <input type="text" id="blood_group" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>HOME:</strong> <input type="text" id="home" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>WARD:</strong> <input type="text" id="ward" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>POST OFFICE:</strong> <input type="text" id="post_office" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>POSTAL CODE:</strong> <input type="text" id="postal_code" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>CITY:</strong> <input type="text" id="city" disabled style="text-transform: uppercase;">
+                </label>
+                <label style="font-weight: bold; text-transform: uppercase;">
+                    <strong>COUNTRY:</strong> <input type="text" id="country" disabled style="text-transform: uppercase;">
+                </label>
+                
+                
+                
+            </div>
+            
+
+            <div class="btn-container">
+                <button class="btn enable">Enable Update</button>
+                <button class="btn update" disabled>Update Profile</button>
+                <button class="btn delete" disabled>Delete</button>
+                <button class="btn cancel" disabled>Cancel</button>
+                
+                    <button class="btn change-password" disabled id="changePasswordButton">Change Password</button> 
+               
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+         document.getElementById('changePasswordButton').addEventListener('click', () => {
+            window.location.href = 'admin_change_password.html';
+        });
+
+         const inputs = document.querySelectorAll('input');
+        const enableButton = document.querySelector('.enable');
+        const updateButton = document.querySelector('.update');
+        const deleteButton = document.querySelector('.delete');
+        const cancelButton = document.querySelector('.cancel');
+        const changePasswordButton = document.querySelector('.change-password');
+
+
+        let originalData = {};
+
+        // Enable inputs for editing
+        enableButton.addEventListener('click', () => {
+            inputs.forEach(input => input.disabled = false);
+            updateButton.disabled = false;
+            deleteButton.disabled = false;
+            cancelButton.disabled = false;
+            changePasswordButton.disabled = false; // Enable Change Password button
+
+            
+
+            // Save original data
+            inputs.forEach(input => {
+                originalData[input.id] = input.value;
+            });
+        });
+        changePasswordButton.addEventListener('click', () => {
+            window.location.href = 'admin_change_password.html';
+        });
+
+
+        // Fetch user data based on nid_no
+        window.onload = function() {
+    const nidNo = localStorage.getItem('nid_no');
+
+    if (nidNo) {
+        fetch('http://localhost:3000/home_page/nid', {  // Ensure this URL matches your backend route
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ nid_no: nidNo }) // Sending NID for fetching data
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.result) {
+                const userData = data.result;
+
+                // Set form values
+                document.getElementById('fname').value = userData.fname || '';
+                document.getElementById('lname').value = userData.lname || '';
+                document.getElementById('id_no').value = userData.id_no || '';
+                document.getElementById('phone_number').value = userData.phone_number || '';
+                document.getElementById('father_name').value = userData.father_name || '';
+                document.getElementById('mother_name').value = userData.mother_name || '';
+                document.getElementById('nid_no').value = userData.nid_no || '';
+                document.getElementById('dob').value = userData.dob ? new Date(userData.dob).toISOString().slice(0, 10) : '';
+                document.getElementById('blood_group').value = userData.blood_group || '';
+                document.getElementById('home').value = userData.home || '';
+                document.getElementById('ward').value = userData.ward || '';
+                document.getElementById('post_office').value = userData.post_office || '';
+                document.getElementById('postal_code').value = userData.postal_code || '';
+                document.getElementById('city').value = userData.city || '';
+                document.getElementById('country').value = userData.country || '';
+
+                // Set the profile picture
+                const profilePictureElement = document.getElementById("currentProfilePicture");
+                if (userData.profile_picture) {
+                    // If profile picture exists, update the img src
+                    profilePictureElement.src = `http://localhost:3000/${userData.profile_picture}`;
+                } 
+
+                 
+            } else {
+                console.error('No user data found for this NID.');
+                alert('No user data found. Please check your NID.');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching user data:', error);
+            alert('Failed to fetch data. Please try again later.');
+        });
+    } else {
+        alert('NID not found in localStorage.');
+    }
+};
+
+
+        
+        // Update user data
+updateButton.addEventListener('click', () => {
+    const formData = new FormData();
+
+    // Collect all inputs except disabled ones
+    inputs.forEach(input => {
+        if (!input.disabled) {
+            formData.append(input.id, input.value); // Append all enabled input values
+        }
+    });
+
+    
+
+    // Make the request to the server
+    fetch('http://localhost:3000/update_user', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Profile updated successfully');
+            window.location.href = './edit_voter.html';
+        } else {
+            alert('Failed to update profile');
+        }
+    })
+    .catch(error => console.error('Error updating user data:', error));
+});
+
+
+        // Delete user
+deleteButton.addEventListener('click', () => {
+    const nidNo = document.getElementById('nid_no').value;
+
+    fetch('http://localhost:3000/delete_user', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nid_no: nidNo })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            alert('Profile deleted successfully');
+            window.location.href = './login.html';
+        } else {
+            alert('Failed to delete profile: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        alert('Error deleting user: ' + error.message);
+        console.error('Error deleting user:', error);
+    });
+});
+
+        // Cancel changes
+        cancelButton.addEventListener('click', () => {
+            inputs.forEach(input => {
+                input.value = originalData[input.id];
+                input.disabled = true;
+            });
+
+            updateButton.disabled = true;
+            deleteButton.disabled = true;
+            cancelButton.disabled = true;
+        });
+    </script>
+
+</body>
+</html>

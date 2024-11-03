@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter Registration</title>
+    <style>
+        body {
+            background-image: url('./images/299.jpeg');
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            animation: fadeIn 1s ease-in-out;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="password"], input[type="date"], input[type="file"], select {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        input:focus, select:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        label {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+            margin-top: 10px;
+            display: block;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @media (max-width: 600px) {
+            .container {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Voter Registration</h2>
+        <form id="registrationForm" enctype="multipart/form-data">
+            <label for="fname">First Name</label>
+            <input type="text" id="fname" name="fname" pattern="[A-Z]+" required oninput="this.value = this.value.toUpperCase();" title="Please enter only capital letters (A-Z)">
+
+            <label for="lname">Last Name</label>
+            <input type="text" id="lname" name="lname" pattern="[A-Z]+" required oninput="this.value = this.value.toUpperCase();" title="Please enter only capital letters (A-Z)">
+
+            <label for="email">Email</label>
+            <input type="text" id="email" name="email" required>
+
+            <label for="phone_number">Phone Number</label>
+            <input type="text" id="phone_number" name="phone_number" required pattern="\d{11}" maxlength="11" title="Must be exactly 11 digits" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+            
+            
+            <label for="gender">Gender</label>
+            <select id="gender" name="gender" required>
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+            </select>
+
+            <label for="father_name">Father's Name</label>
+            <input type="text" id="father_name" name="father_name" pattern="[A-Z]+" required oninput="this.value = this.value.toUpperCase();" title="Please enter only capital letters (A-Z)">
+
+            <label for="mother_name">Mother's Name</label>
+            <input type="text" id="mother_name" name="mother_name" pattern="[A-Z]+" required oninput="this.value = this.value.toUpperCase();" title="Please enter only capital letters (A-Z)">
+
+            <label for="nid_no">National ID Number</label>
+            <input type="text" id="nid_no" name="nid_no" required pattern="\d{10}" maxlength="10" title="Must be exactly 13 digits" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+
+            
+            
+            <label for="dob">Date of Birth</label>
+            <input type="date" id="dob" name="dob" required>
+
+            <label for="blood_group">Blood Group</label>
+            <select id="blood_group" name="blood_group" required>
+                <option value="">Select Blood Group</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+            </select>
+
+            <label for="home">Home No</label>
+            <input type="text" id="home" name="home" required pattern="\d{1,3}" maxlength="3" title="Must be 1 to 3 digits" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+
+            <label for="ward">WARD No</label>
+            <input type="text" id="ward" name="WARD" required pattern="\d{1,3}" maxlength="3" title="Must be 1 to 3 digits" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+
+            <label for="post_office">Post Office</label>
+            <input type="text" id="post_office" name="post_office" pattern="[A-Z]+" required oninput="this.value = this.value.toUpperCase();" title="Please enter only capital letters (A-Z)">
+
+            <label for="postal_code">Postal Code</label>
+            <input type="text" id="postal_code" name="postal_code" required pattern="\d{4}" maxlength="4" title="Must be exactly 4 digits" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+
+            <label for="city">City</label>
+            <select id="city" name="city" required>
+                <option value="">Select City</option>
+                <option value="Barishal">Barishal</option>
+                <option value="Chattogram">Chattogram</option>
+                <option value="Dhaka">Dhaka</option>
+                <option value="Khulna">Khulna</option>
+                <option value="Rajshahi">Rajshahi</option>
+                <option value="Rangpur">Rangpur</option>
+                <option value="Mymensingh">Mymensingh</option>
+                <option value="Sylhet">Sylhet</option>
+            </select>
+
+            <label for="country">Country</label>
+            <input type="text" id="country" name="country" pattern="[A-Z]+" required oninput="this.value = this.value.toUpperCase();" title="Please enter only capital letters (A-Z)">
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="retype_password">Retype Password</label>
+            <input type="password" id="retype_password" name="retype_password" required>
+
+            <label for="profile_picture">Profile Picture</label>
+            <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+            
+
+            <button type="submit" class="btn">Register</button>
+            
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('registrationForm').addEventListener('submit', function(event) {
+            event.preventDefault();  // Prevent the form from submitting normally
+    
+            const formData = new FormData();  // Create FormData object
+    
+            formData.append('fname', event.target.fname.value);
+            formData.append('lname', event.target.lname.value);
+            formData.append('email', event.target.email.value);
+            formData.append('phone_number', event.target.phone_number.value);
+            formData.append('gender', event.target.gender.value);
+            formData.append('father_name', event.target.father_name.value);
+            formData.append('mother_name', event.target.mother_name.value);
+            formData.append('nid_no', event.target.nid_no.value);
+            formData.append('dob', event.target.dob.value);
+            formData.append('blood_group', event.target.blood_group.value);
+            formData.append('home', event.target.home.value);
+            formData.append('ward', event.target.ward.value);
+            formData.append('post_office', event.target.post_office.value);
+            formData.append('postal_code', event.target.postal_code.value);
+            formData.append('city', event.target.city.value);
+            formData.append('country', event.target.country.value);
+            formData.append('password', event.target.password.value);
+    
+            const profilePicture = event.target.profile_picture.files[0];
+            if (profilePicture) {
+                formData.append('profile_picture', profilePicture);  // Append file if exists
+            }
+    
+            fetch('http://localhost:3000/add_voter', {
+                method: 'POST',
+                body: formData  // Send form data directly
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                    window.location.href = 'voter_list.html';
+                } else {
+                    alert('Registration failed: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        html, body {
+            background-image: url('./images/299.jpeg');
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden; 
+        }
+
+        body {
+            background-size: cover;
+            background-position: center;
+        }
+
+        header {
+            top: 0;
+            left: 0;
+            position: fixed;
+            background: #22242A;
+            padding: 15px 20px;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .left_area h3 {
+            color: #fff;
+            margin: 0;
+            text-transform: uppercase;
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .logout_btn {
+            padding: 5px 10px;
+            background: #19B3D3;
+            text-decoration: none;
+            float: right;
+            margin-top: -30px;
+            margin-right: 20px;
+            border-radius: 2px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            transition: 0.3s;
+        }
+
+        .logout_btn:hover {
+            background: #0B87A6;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 70px;
+            background: #2f323a;
+            padding-top: 30px;
+            width: 250px;
+            height: calc(100% - 70px); 
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar a {
+            color: #fff;
+            display: block;
+            padding: 15px 40px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .sidebar a:hover {
+            background: #19B3D3;
+        }
+
+        .content {
+            margin-left: 250px;
+            margin-top: 70px;
+            padding: 20px;
+            height: calc(100% - 70px); 
+            background-color: rgba(255, 255, 255, 0.9);
+            box-sizing: border-box;
+            overflow: auto; 
+        }
+
+        .word {
+            text-align: center;
+        }
+
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            margin-top: 30px;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 15px;
+            flex: 1 1 300px;
+            max-width: 350px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .card h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .card p {
+            font-size: 18px;
+            color: #555;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .button-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    margin-bottom: 40px;
+     
+}
+
+.publish_btn, .remove_btn {
+    background-color: red;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.remove_btn {
+    background-color: #d9534f;
+}
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="left_area">
+            <h3>Election Management</h3>
+        </div>
+        <a href="#" class="logout_btn" id="logoutButton">Logout</a>
+    </header>
+
+    <div class="sidebar">
+        <div>
+            <h3>Candidate</h3>
+            <a href="candidate_list.html">Candidate List</a>
+            <a href="add_candidate.html">Add New Candidate</a>
+            <a href="search_candidate.html">Change Candidate Info</a>
+            <h3>Voter</h3>
+            <a href="voter_list.html">Voter List</a>
+            <a href="add_voter.html">Add Voter</a>
+            <a href="Search_voter.html">Change Voter Info</a>
+        </div>
+        <div class="button-group">
+            <button class="publish_btn" id="publishResultButton">PUBLISH RESULT</button>
+            <button class="remove_btn" id="removeResultButton">REMOVE RESULT</button>
+        </div>
+    </div>
+
+    <div class="content">
+        <h1 class="word">Admin Dashboard</h1>
+        <div class="card-container">
+            <div class="card">
+                <p>Total Voter <br> <span id="voterCount"></span></p>
+            </div>
+            <div class="card">
+                <p>Total Candidate <br> <span id="candidateCount"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if (!localStorage.getItem('admin_id')) {
+            window.location.href = 'home_page.html';
+        }
+
+        // Fetch candidate and voter counts
+        fetch('http://localhost:3000/candidate_count', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+            .then(res => res.json())
+            .then(data => document.getElementById('candidateCount').textContent = data.status === 'success' ? data.count : 'Error')
+            .catch(error => console.error('Error fetching candidate count:', error));
+
+        fetch('http://localhost:3000/voter_count', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+            .then(res => res.json())
+            .then(data => document.getElementById('voterCount').textContent = data.status === 'success' ? data.count : 'Error')
+            .catch(error => console.error('Error fetching voter count:', error));
+
+        // Logout functionality
+        document.getElementById('logoutButton').addEventListener('click', function() {
+            localStorage.clear();
+            window.location.href = 'home_page.html';
+        });
+
+        // Publish Result functionality
+        document.getElementById('publishResultButton').addEventListener('click', function() {
+            fetch('http://localhost:3000/publish_result', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Result published successfully');
+                } else {
+                    alert('Failed to publish result');
+                }
+            })
+            .catch(error => console.error('Error publishing result:', error));
+        });
+
+        // Remove Result functionality
+        document.getElementById('removeResultButton').addEventListener('click', function() {
+            fetch('http://localhost:3000/remove_result', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Result removed successfully');
+                } else {
+                    alert('Failed to remove result');
+                }
+            })
+            .catch(error => console.error('Error removing result:', error));
+        });
+    </script>
+</body>
+</html>

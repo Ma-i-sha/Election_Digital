@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrator Login</title>
+    <style>
+        body {
+            background-image: url('./images/299.jpeg');
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+
+        .container {
+            width: 400px;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2);
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #4cae4c;
+        }
+
+        .error,
+        .success {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Administrator Login</h2>
+        <form id="loginForm">
+            <input type="text" id="admin_id" placeholder="Admin ID" required pattern="\d{10}" maxlength="10" title="Must be exactly 10 digits" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+            <div class="error" id="errorMsg"></div>
+            <div class="success" id="successMsg"></div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let adminId = document.getElementById('admin_id').value;
+            let password = document.getElementById('password').value;
+            let errorMsg = document.getElementById('errorMsg');
+            let successMsg = document.getElementById('successMsg');
+            
+            errorMsg.textContent = '';
+            successMsg.textContent = '';
+
+            
+            let data = { 
+                admin_id: adminId, 
+                password: password 
+            };
+
+            fetch('http://localhost:3000/login_admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    successMsg.textContent = "Login successful!";
+                    // Save admin_id to localStorage
+                    window.localStorage.setItem('admin_id', adminId);
+                    window.location.href = 'admin_dashboard.html';  // Redirect after successful login
+                } else {
+                    errorMsg.textContent = "Login failed: " + data.message;
+                }
+            })
+            .catch(error => {
+                errorMsg.textContent = "An error occurred: " + error.message;
+            });
+        });
+    </script>
+</body>
+</html>

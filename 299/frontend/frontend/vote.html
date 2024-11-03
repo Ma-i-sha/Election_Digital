@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vote for Candidates</title>
+    <style>
+        body {
+            background-image: url('./images/299.jpeg');
+            font-family: Arial, sans-serif;
+        }
+        .profile-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .profile-card {
+            background-color: #e8f5e9; 
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px;
+            width: 300px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            cursor: pointer;
+        }
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            background-color: #ddd;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            object-fit: cover;
+        }
+        .profile-info {
+            text-align: center;
+        }
+        .vote-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .vote-button:hover {
+            background-color: #45a049;
+        }
+        .selected {
+            border-color: #4caf50;
+            box-shadow: 0 0 10px #4caf50;
+        }
+        .timer {
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Vote for Candidates</h1>
+
+    <div class="timer" id="timer">Time Left: 05:00</div>
+
+    <div class="profile-container" id="profileContainer"></div>
+    <button class="vote-button" id="voteButton">Vote</button>
+
+    <script>
+        window.onload = function() {
+            const ward = localStorage.getItem('ward');
+            const city = localStorage.getItem('city');
+            const voterNID = localStorage.getItem('nid_no');  
+        
+            if (!ward || !city || !voterNID) {
+                console.error('Ward, city, or nid_no not found in localStorage');
+                alert('An error occurred. Please log in again.');
+                window.location.href = 'login.html'; // Redirect to login if data is missing
+                return;
+            }
+
+            // Timer logic
+            let timeLeft = 300; 
+            const timerElement = document.getElementById('timer');
+            
+            const timerInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert('Time is up! You will be logged out.');
+                    localStorage.clear(); 
+                    window.location.href = 'home_page.html'; 
+                    return;
+                }
+
+                timeLeft--;
+
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+
+                // Display the updated time
+                timerElement.innerText = `Time Left: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+
+            // Fetch candidates based on ward and city
+            fetch('http://localhost:3000/view_candidates', { 
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json, text/plain, */*',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    ward: ward,
+                    city: city,
+                    nid_no: voterNID
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const container = document.getElementById("profileContainer"); 
+                container.innerHTML = '';
+    
+                if (data.result.length === 0) {
+                    container.innerHTML = '<p>No candidates found for the selected ward and city.</p>';
+                    return;
+                }
+    
+                // Loop through candidates and create profile cards
+                data.result.forEach(candidate => { 
+                    const card = document.createElement('div');
+                    card.classList.add('profile-card');
+                    card.dataset.nidNo = candidate.nid_no; 
+    
+                    const img = document.createElement('img');
+                    img.classList.add('profile-img');
+                    img.src = candidate.profile_picture ? `http://localhost:3000/${candidate.profile_picture}` : '/path/to/default/image.jpg'; 
+                    img.alt = `${candidate.fname} ${candidate.lname}'s profile picture`;
+                    card.appendChild(img);
+    
+                    const info = document.createElement('div');
+                    info.classList.add('profile-info');
+    
+                    const name = document.createElement('h3');
+                    name.innerText = `${candidate.fname} ${candidate.lname}`;
+                    const wardInfo = document.createElement('p');
+                    wardInfo.innerText = `Ward: ${candidate.ward}`;
+                    const nidInfo = document.createElement('p');
+                    nidInfo.innerText = `NID No: ${candidate.nid_no}`; 
+    
+                    info.appendChild(name);
+                    info.appendChild(wardInfo);
+                    info.appendChild(nidInfo);
+                    card.appendChild(info);
+    
+                    container.appendChild(card);
+    
+                    // Handle card selection (single selection)
+                    card.onclick = function() {
+                        const previouslySelectedCard = document.querySelector('.profile-card.selected');
+                        if (previouslySelectedCard) {
+                            previouslySelectedCard.classList.remove('selected');
+                        }
+                        this.classList.add('selected');
+                    };
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    
+            // Voting logic
+            document.getElementById('voteButton').onclick = function() {
+                const selectedCard = document.querySelector('.profile-card.selected');
+                
+                if (!selectedCard) {
+                    alert('Please select a candidate to vote.');
+                    return;
+                }
+
+                const selectedNID = selectedCard.dataset.nidNo;
+
+                // Send the selected candidate's NID and the user's NID to the backend
+                fetch('http://localhost:3000/vote', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json, text/plain, */*',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        voter_nid_no: voterNID, 
+                        candidate_nid_no: selectedNID  
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data.message);
+                    if (data.message === 'Vote successfully recorded.') {
+                        localStorage.clear();  
+                        window.location.href = 'home_page.html';
+                    } else {
+                        alert(data.message); // Alert if there is any error in the response message
+                    }
+                })
+                .catch(error => {
+                    console.error('Error voting:', error);
+                    alert('An error occurred while voting. Please try again.');
+                });
+            };
+        };
+    </script>
+    
+</body>
+</html>
