@@ -23,6 +23,7 @@ const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 
 
+
 const app = express();
 const port = 3000;
 
@@ -156,79 +157,39 @@ app.post('/user_check', (req, res) => {
   const { nid_no, phone_number, city, ward, password } = req.body;
 
   if (!nid_no || !phone_number || !city || !ward || !password) {
-    return res.status(400).json({ error: 'Please fill in all fields.' });
+      return res.status(400).json({ error: 'Please fill in all fields.' });
   }
 
-  // Query the voter table with the given credentials
   const query = 'SELECT * FROM voter WHERE nid_no = ? AND phone_number = ? AND city = ? AND ward = ?';
   db.query(query, [nid_no, phone_number, city, ward], (err, results) => {
-    if (err) {
-      console.error('Error querying the database:', err);
-      return res.status(500).json({ error: 'Database error' });
-    }
+      if (err) return res.status(500).json({ error: 'Database error' });
+      if (results.length === 0) return res.status(401).json({ error: 'Invalid credentials' });
 
-    if (results.length === 0) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    const user = results[0];
-
-    // Check if the user has already voted
-    if (user.vote_given !== 0) {
-      // Query the administrator table to check the result status
-      const adminQuery = 'SELECT result FROM administrator LIMIT 1';
-      db.query(adminQuery, (err, adminResults) => {
-        if (err) {
-          console.error('Error querying the administrator table:', err);
-          return res.status(500).json({ error: 'Database error' });
-        }
-
-        const resultPublished = adminResults[0].result === 1;
-
-        // Construct user data for response
-        const userData = {
-          id: user.id,
-          fname: user.fname,
-          lname: user.lname,
-          email: user.email,
-          phone_number: user.phone_number,
-          city: user.city,
-          ward: user.ward,
-          profile_picture: user.profile_picture
-        };
-
-        if (resultPublished) {
-          return res.json({ vote_status: 1, result_published: true, user: userData, message: 'User has already voted' });
-        } else {
-          return res.json({ vote_status: 1, result_published: false, user: userData, message: 'User has already voted, but result is not published' });
-        }
-      });
-    } else {
-      // Validate password
+      const user = results[0];
       bcrypt.compare(password, user.password, (err, isMatch) => {
-        if (err) {
-          console.error('Error comparing passwords:', err);
-          return res.status(500).json({ error: 'Error validating password' });
-        }
+          if (!isMatch) return res.status(401).json({ error: 'Invalid password' });
 
-        if (!isMatch) {
-          return res.status(401).json({ error: 'Invalid password' });
-        }
-
-        const userData = {
-          id: user.id,
-          fname: user.fname,
-          lname: user.lname,
-          email: user.email,
-          phone_number: user.phone_number,
-          city: user.city,
-          ward: user.ward,
-          profile_picture: user.profile_picture
-        };
-
-        return res.json({ message: 'Login successful', user: userData });
+          if (user.vote_given !== 0) {
+              const adminQuery = 'SELECT result FROM administrator LIMIT 1';
+              db.query(adminQuery, (err, adminResults) => {
+                  const resultPublished = adminResults[0].result === 1;
+                  res.json({ vote_status: 1, result_published: resultPublished, user });
+              });
+          } else {
+              res.json({ vote_status: 0, user });
+          }
       });
-    }
+  });
+});
+
+app.post('/get_user_image', (req, res) => {
+  const { nid_no } = req.body;
+  const query = 'SELECT face_descriptor FROM voter WHERE nid_no = ?';
+  db.query(query, [nid_no], (err, results) => {
+      if (err) return res.status(500).json({ error: 'Database error' });
+      if (results.length === 0) return res.status(404).json({ error: 'User not found' });
+
+      res.json({ descriptor: JSON.parse(results[0].face_descriptor) });
   });
 });
 
@@ -904,13 +865,19 @@ app.post('/publish_result', (req, res) => {
   });
 });
 
-
+app.post('/remove_result', (req, res) => {
+  db.query('UPDATE administrator SET result = 0', (error, results) => {
+      if (error) {
+          return res.json({ status: 'error', message: error.message });
+      }
+      res.json({ status: 'success', message: 'Result removed' });
+  });
+});
 
 // Start the server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
-
 
 
 
