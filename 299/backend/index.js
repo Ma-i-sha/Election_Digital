@@ -184,12 +184,12 @@ app.post('/user_check', (req, res) => {
 
 app.post('/get_user_image', (req, res) => {
   const { nid_no } = req.body;
-  const query = 'SELECT face_descriptor FROM voter WHERE nid_no = ?';
+  const query = 'SELECT profile_picture FROM voter WHERE nid_no = ?';
   db.query(query, [nid_no], (err, results) => {
       if (err) return res.status(500).json({ error: 'Database error' });
       if (results.length === 0) return res.status(404).json({ error: 'User not found' });
 
-      res.json({ descriptor: JSON.parse(results[0].face_descriptor) });
+      res.json({ descriptor: JSON.parse(results[0].profile_picture), });
   });
 });
 
@@ -832,25 +832,20 @@ app.post('/vote', async (req, res) => {
 });
 
 app.get('/candidateinfo', (req, res) => {
-  // Get the ward_id from the request query parameters
   const wardId = req.query.ward_id;
 
-  // Prepare the query with a WHERE clause to filter by ward_id
   const query = 'SELECT id, nid_no, fname, lname, ward, city, profile_picture, vote_count FROM candidate WHERE ward = ?';
 
-  // Execute the query, passing in the wardId to replace the placeholder (?)
   db.query(query, [wardId], (err, results) => {
     if (err) {
       console.error('Error executing query: ', err);
       return res.status(500).json({ error: 'Database query failed' });
     }
 
-    // If no candidates are found, return a message indicating that
     if (results.length === 0) {
       return res.status(404).json({ message: 'No candidates found for this ward' });
     }
 
-    // Send the matching results back as JSON
     res.json(results);
   });
 });
@@ -873,6 +868,54 @@ app.post('/remove_result', (req, res) => {
       res.json({ status: 'success', message: 'Result removed' });
   });
 });
+// Endpoint to get all wards with candidate information
+app.get('/candidateinfos', (req, res) => {
+  const query = `
+      SELECT ward, id, nid_no, fname, lname, city, profile_picture, vote_count 
+      FROM candidate
+  `;
+
+  db.query(query, (err, results) => {
+      if (err) {
+          console.error('Error executing query:', err);
+          return res.status(500).json({ error: 'Database query failed' });
+      }
+
+      if (results.length === 0) {
+          return res.status(404).json({ message: 'No candidates found' });
+      }
+
+      // Group candidates by ward
+      const wardData = results.reduce((acc, candidate) => {
+          const wardId = candidate.ward;
+          if (!acc[wardId]) {
+              acc[wardId] = [];
+          }
+          acc[wardId].push(candidate);
+          return acc;
+      }, {});
+
+      res.json(wardData);
+  });
+});
+
+app.get('/checkAdminResult', (req, res) => {
+  const query = 'SELECT result FROM administrator'; // Adjust query as per your requirement
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error executing query:', err);
+      return res.status(500).json({ error: 'Database query failed' });
+    }
+
+    if (results.length > 0) {
+      const resultStatus = results[0].result;
+      res.json({ result: resultStatus }); // Send result back to client
+    } else {
+      res.status(404).json({ error: 'Administrator not found' });
+    }
+  });
+});
+
 
 // Start the server
 app.listen(port, () => {
