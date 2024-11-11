@@ -112,6 +112,7 @@
       max-height: auto;
       border-radius: 10px;
       box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+      z-index: -9999;
     }
 
     canvas {}
@@ -153,12 +154,15 @@
       </div>
     </form>
     <div id="face-verification">
-      <video id="video" autoplay width="320" height="240" muted></video>
-      <canvas id="canvas"></canvas>
+      <div class="f_container">
+        <video id="video" autoplay width="320" height="240" muted></video>
+        <canvas id="canvas"></canvas>
+      </div>
     </div>
   </div>
 
   <script>
+    let imagepath=null;
     // import * as faceapi from 'https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/+esm'
     async function loadFaceAPI() {
       try {
@@ -204,6 +208,12 @@
         .then(res => {
           loader.style.display = 'none';
           if (res.vote_status === 0) {
+            imagepath=res.user.profile_picture;
+            console.log(imagepath);
+            const regex = /\\(\d+)\.jpg$/;
+            const match = imagepath.match(regex);
+            imagepath=match[1];
+            console.log(match);
             window.localStorage.setItem('nid_no', nid_no);
             window.localStorage.setItem('user', JSON.stringify(res.user));
             window.localStorage.setItem('city', city);
@@ -228,7 +238,12 @@
 
     async function fetchImageById(id) {
       const imagePath = `../backend/uploads/${id}.jpg`;
-      return await faceapi.fetchImage(imagePath);
+      try{
+        const img=await faceapi.fetchImage(imagePath);
+        return img;
+      }catch(e){
+        alert('Face Not Match' )
+      }
     }
 
     async function startVideo() {
@@ -244,7 +259,7 @@
       };
 
       // Load labeled face descriptor
-      const img = await fetchImageById(localStorage.getItem('nid_no'));
+      const img = await fetchImageById(imagepath);
       const detection = await faceapi.detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
         .withFaceLandmarks()
         .withFaceDescriptor();
@@ -259,10 +274,18 @@
       faceapi.matchDimensions(canvas, displaySize);
 
       async function detectFaces() {
+        patience_time = 20000
+        current_wait = 0
+
         console.log("detect face called")
         video.addEventListener('play', () => {
           const interval = setInterval(async () => {
             console.log("detecting")
+            if (current_wait >= patience_time) {
+              alert("Failed to verify.")
+              window.location.href = './login.html'
+              return 
+            }
 
             const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
               .withFaceLandmarks()
@@ -290,6 +313,8 @@
               });
 
             }
+            current_wait += 1000
+          
           }, 1000); // Detect every 1000ms
         });
       }
