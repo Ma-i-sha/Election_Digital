@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Comparison</title>
+</head>
+<body>
+    <h1>Image Comparison</h1>
+    <input type="file" id="imageUpload" accept="image/*" />
+    <button id="compareButton">Compare Image</button>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('compareButton').addEventListener('click', async () => {
+            const fileInput = document.getElementById('imageUpload');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Please upload an image.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const response = await fetch('http://127.0.0.1:5000/compare', {
+                method: 'POST',
+                body: formData
+            });
+
+            const resultDiv = document.getElementById('result');
+            if (response.ok) {
+                const result = await response.json();
+                resultDiv.innerText = `Result: ${result.result} (Match Ratio: ${result.match_ratio.toFixed(2)})`;
+            } else {
+                const error = await response.json();
+                resultDiv.innerText = `Error: ${error.error}`;
+            }
+        });
+    </script>
+</body>
+</html>

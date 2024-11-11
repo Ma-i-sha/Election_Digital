@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vote Count Graphs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .logout-btn {
+            align-self: flex-end;
+            margin-bottom: 20px;
+        }
+        .logout-btn button {
+            padding: 10px 20px;
+            background-color: #ff4d4d;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .chart-container {
+            width: 800px; 
+            height: 400px; 
+            margin-bottom: 30px;
+        }
+        canvas {
+            background-color: white;
+            border-radius: 8px;
+            height: 400px; 
+            width: 800px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="logout-btn">
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <div id="charts-container"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+      async function fetchWardData() {
+          try {
+              const response = await fetch(`http://localhost:3000/candidateinfos`);
+              const data = await response.json();
+  
+              console.log('Data received from backend:', data);
+  
+              if (!data || Object.keys(data).length === 0) {
+                  console.log('No data found for any ward.');
+                  return;
+              }
+  
+              Object.entries(data).forEach(([wardId, candidates]) => {
+                  if (Array.isArray(candidates)) {
+                      createChart(wardId, candidates);
+                  } else {
+                      console.error(`Data for ward ${wardId} is not an array:`, candidates);
+                  }
+              });
+          } catch (error) {
+              console.error('Error fetching data:', error);
+          }
+      }
+  
+      function createChart(wardId, candidates) {
+          const chartContainer = document.createElement('div');
+          chartContainer.classList.add('chart-container');
+          chartContainer.innerHTML = `<h3>Ward ${wardId}</h3>`;
+          
+          const canvas = document.createElement('canvas');
+          chartContainer.appendChild(canvas);
+          document.getElementById('charts-container').appendChild(chartContainer);
+  
+          const candidateNames = candidates.map(candidate => `${candidate.fname} ${candidate.lname}`);
+          const voteCounts = candidates.map(candidate => candidate.vote_count);
+  
+          new Chart(canvas.getContext('2d'), {
+              type: 'bar',
+              data: {
+                  labels: candidateNames,
+                  datasets: [{
+                      label: 'Vote Count',
+                      data: voteCounts,
+                      backgroundColor: ['#ff0000', '#008000', '#0000ff', '#ffa500', '#8b0000'],
+                      borderColor: '#000000',
+                      borderWidth: 1,
+                  }]
+              },
+              options: {
+                  scales: {
+                      y: {
+                          beginAtZero: true,
+                          title: {
+                              display: true,
+                              text: 'VOTE COUNT',
+                              color: '#000',
+                              font: {
+                                  size: 16,
+                                  weight: 'bold'
+                              }
+                          }
+                      },
+                      x: {
+                          title: {
+                              display: true,
+                              text: 'CANDIDATES',
+                              color: '#000',
+                              font: {
+                                  size: 16,
+                                  weight: 'bold'
+                              }
+                          }
+                      }
+                  }
+              }
+          });
+      }
+  
+      function logout() {
+          localStorage.clear();
+          window.location.href = 'home_page.html';
+      }
+  
+      fetchWardData();
+  </script>
+  
+</body>
+</html>

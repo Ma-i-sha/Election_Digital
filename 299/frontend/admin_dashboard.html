@@ -13,12 +13,12 @@
             font-family: Arial, sans-serif;
             overflow: hidden; 
         }
-    
+
         body {
             background-size: cover;
             background-position: center;
         }
-    
+
         header {
             top: 0;
             left: 0;
@@ -28,7 +28,7 @@
             width: 100%;
             z-index: 1000;
         }
-    
+
         .left_area h3 {
             color: #fff;
             margin: 0;
@@ -36,7 +36,7 @@
             font-size: 22px;
             font-weight: 900;
         }
-    
+
         .logout_btn {
             padding: 5px 10px;
             background: #19B3D3;
@@ -50,24 +50,25 @@
             color: #fff;
             transition: 0.3s;
         }
-    
+
         .logout_btn:hover {
             background: #0B87A6;
         }
-    
+
         .sidebar {
-    position: fixed;
-    left: 0;
-    top: 70px;
-    background: #2f323a;
-    padding-top: 30px;
-    width: 250px;
-    height: calc(100% - 70px); 
-    z-index: 999;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
+            position: fixed;
+            left: 0;
+            top: 70px;
+            background: #2f323a;
+            padding-top: 30px;
+            width: 250px;
+            height: calc(100% - 70px); 
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
         .sidebar a {
             color: #fff;
             display: block;
@@ -76,11 +77,11 @@
             font-size: 16px;
             transition: background 0.3s;
         }
-    
+
         .sidebar a:hover {
             background: #19B3D3;
         }
-    
+
         .content {
             margin-left: 250px;
             margin-top: 70px;
@@ -90,18 +91,18 @@
             box-sizing: border-box;
             overflow: auto; 
         }
-    
+
         .word {
             text-align: center;
         }
-    
+
         .card-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: space-around;
             margin-top: 30px;
         }
-    
+
         .card {
             background-color: #fff;
             border-radius: 10px;
@@ -113,22 +114,32 @@
             text-align: center;
             transition: transform 0.3s;
         }
-    
+
         .card h2 {
             font-size: 36px;
             margin-bottom: 20px;
         }
-    
+
         .card p {
             font-size: 18px;
             color: #555;
         }
-    
+
         .card:hover {
             transform: scale(1.05);
         }
 
-        .publish_btn {
+        .button-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    margin-bottom: 40px;
+     
+}
+
+.publish_btn, .remove_btn {
     background-color: red;
     color: white;
     padding: 10px 20px;
@@ -136,8 +147,11 @@
     font-weight: bold;
     border: none;
     cursor: pointer;
-    margin: 20px 20px 50px 20px; 
     border-radius: 5px;
+}
+
+.remove_btn {
+    background-color: #d9534f;
 }
     </style>
 </head>
@@ -161,7 +175,10 @@
             <a href="add_voter.html">Add Voter</a>
             <a href="Search_voter.html">Change Voter Info</a>
         </div>
-        <button class="publish_btn" id="publishResultButton">PUBLISH RESULT</button>
+        <div class="button-group">
+            <button class="publish_btn" id="publishResultButton">PUBLISH RESULT</button>
+            <button class="remove_btn" id="removeResultButton">REMOVE RESULT</button>
+        </div>
     </div>
 
     <div class="content">
@@ -213,6 +230,23 @@
                 }
             })
             .catch(error => console.error('Error publishing result:', error));
+        });
+
+        // Remove Result functionality
+        document.getElementById('removeResultButton').addEventListener('click', function() {
+            fetch('http://localhost:3000/remove_result', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Result removed successfully');
+                } else {
+                    alert('Failed to remove result');
+                }
+            })
+            .catch(error => console.error('Error removing result:', error));
         });
     </script>
 </body>

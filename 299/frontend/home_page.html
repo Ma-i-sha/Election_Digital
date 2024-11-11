@@ -113,7 +113,7 @@
 <body>
   <header>
     <div class="container">
-      <img src="../images/vote.png" alt="Voting Logo" class="logo">
+      <img src="./images/vote.png" alt="Voting Logo" class="logo">
       <h1>Voting Management System</h1>
     </div>
   </header>
@@ -123,10 +123,13 @@
       <h2>Login As</h2>
       <div class="login-options">
         <div class="login-option">
-          <a href="admin_login.html"><img src="../images/administrator.png" alt="Admin Logo" class="logo"><br><br>Administrator</a>
+          <a href="admin_login.html"><img src="./images/administrator.png" alt="Admin Logo" class="logo"><br><br>Administrator</a>
         </div>
         <div class="login-option">
-          <a href="login.html"><img src="../images/voter.png" alt="Voter Logo" class="logo"><br><br>Voter</a>
+          <a href="login.html"><img src="./images/voter.png" alt="Voter Logo" class="logo"><br><br>Voter</a>
+        </div>
+        <div class="login-option">
+          <a href="#" id="result-link"><img src="./images/result.png" alt="Result Logo" class="logo"><br><br>Result</a>
         </div>
       </div>
     </section>
@@ -137,6 +140,30 @@
       <p>&copy; 2024 Voting Management System. All rights reserved.</p>
     </div>
   </footer>
+
+  <script>
+    async function checkResultStatus() {
+      try {
+        const response = await fetch('http://localhost:3000/checkAdminResult'); // Endpoint to check result status
+        const data = await response.json();
+        
+        // Assuming the response has a `result` property
+        if (data.result === 1) {
+          window.location.href = 'results.html'; // Redirect to results page if published
+        } else {
+          alert('Results not published yet'); // Show alert if not published
+        }
+      } catch (error) {
+        console.error('Error fetching result status:', error);
+        alert('An error occurred while checking the result status.');
+      }
+    }
+
+    document.getElementById('result-link').addEventListener('click', function (event) {
+      event.preventDefault(); // Prevent default anchor behavior
+      checkResultStatus(); // Call function to check result status
+    });
+  </script>
 </body>
 
 </html>

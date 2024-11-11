@@ -1,206 +1,300 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voter Login</title>
-    <style>
-        body {
-            background-image: url('./images/299.jpeg');
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #eceff1;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 400px;
-            margin: 50px auto;
-            background-color: white;
-            padding: 30px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            transition: all 0.3s ease-in-out;
-        }
-        .container:hover {
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        }
-        h2 {
-            text-align: center;
-            color: #333;
-            font-size: 24px;
-            margin-bottom: 20px;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-        input[type="text"], input[type="password"], input[type="tel"] {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: border-color 0.2s ease;
-        }
-        input:focus {
-            border-color: #4CAF50;
-            outline: none;
-        }
-        label {
-            margin-top: 10px;
-            display: block;
-            font-weight: bold;
-            color: #555;
-        }
-        .btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            font-size: 18px;
-            margin-top: 20px;
-            transition: background-color 0.3s ease;
-        }
-        .btn:hover {
-            background-color: #45a049;
-        }
-        .register-link {
-            text-align: center;
-            margin-top: 15px;
-        }
-        .register-link a {
-            color: #4CAF50;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-        .register-link a:hover {
-            color: #388E3C;
-        }
-        .loader {
-            display: none;
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            border: 4px solid #f3f3f3; 
-            border-top: 4px solid #3498db; 
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 2s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
-</head>
-<body>
-    <div class="loader"></div>
-    <div class="container">
-        <h2>Voter Login</h2>
-        <form onsubmit="login(event)">
-            <label for="nid_no">NID No</label>
-            <input type="text" id="nid_no" name="nid_no"  required pattern="\d{10}" maxlength="10" title="Must be exactly 10 digits" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
-
-            <label for="phone_number">Phone Number</label>
-            <input type="text" id="phone_number" name="phone_number" required pattern="\d{11}" maxlength="11" title="Must be exactly 11 digits"  oninput="this.value=this.value.replace(/[^0-9]/g,'');">
-
-            <label for="city">City</label>
-<select id="city" name="city" required style="width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; transition: border-color 0.2s ease;">
-    <option value="">Select City</option>
-    <option value="Barishal">Barishal</option>
-    <option value="Chattogram">Chattogram</option>
-    <option value="Dhaka">Dhaka</option>
-    <option value="Khulna">Khulna</option>
-    <option value="Rajshahi">Rajshahi</option>
-    <option value="Rangpur">Rangpur</option>
-    <option value="Mymensingh">Mymensingh</option>
-    <option value="Sylhet">Sylhet</option>
-</select>
-
-
-            <label for="ward">Ward</label>
-            <input type="text" id="ward" name="ward" required pattern="\d{1,3}" maxlength="3" title="Must be 1 to 3 digits" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
-
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
-
-            <button type="submit" class="btn">Login</button>
-
-            <div class="register-link">
-                <p>Don't have an account? <a href="register.html">Register here</a></p>
-            </div>
-        </form>
-    </div>
-
-    <script>
-        function login(event) {
-    event.preventDefault();
-
-    const nid_no = document.getElementById('nid_no').value.trim();
-    const phone_number = document.getElementById('phone_number').value.trim();
-    const city = document.getElementById('city').value;
-    const ward = document.getElementById('ward').value.trim();
-    const password = document.getElementById('password').value.trim();
-
-    const loader = document.querySelector('.loader');
-    loader.style.display = 'block';
-
-    if (!nid_no || !phone_number || !city || !ward || !password) {
-        alert('Please fill in all fields.');
-        loader.style.display = 'none';
-        return;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voter Login</title>
+  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+  <style>
+    /* Base styling */
+    body {
+      background-image: url('./images/299.jpeg');
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #eceff1;
+      margin: 0;
+      padding: 0;
     }
 
-    const user = { nid_no, phone_number, city, ward, password };
+    .container {
+      width: 400px;
+      margin: 50px auto;
+      background-color: white;
+      padding: 30px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      transition: all 0.3s ease-in-out;
+    }
 
-    fetch('http://localhost:3000/user_check', {
+    h2 {
+      text-align: center;
+      color: #333;
+      font-size: 24px;
+      margin-bottom: 20px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      transition: border-color 0.2s ease;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #4CAF50;
+      outline: none;
+    }
+
+    .btn {
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 18px;
+      margin-top: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #45a049;
+    }
+
+    .register-link {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .loader {
+      display: none;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    #face-verification {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    #video {
+      width: 320px;
+      max-width: 320px;
+      height: 240px;
+      max-height: auto;
+      border-radius: 10px;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    canvas {}
+  </style>
+</head>
+
+<body>
+  <div class="loader"></div>
+  <div class="container">
+    <h2>Voter Login</h2>
+    <form onsubmit="login(event)">
+      <label for="nid_no">NID No</label>
+      <input type="text" id="nid_no" name="nid_no" pattern="\d{10}" maxlength="10" title="Must be exactly 10 digits"
+        oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="2111920642">
+      <label for="phone_number">Phone Number</label>
+      <input type="text" id="phone_number" name="phone_number" pattern="\d{11}" maxlength="11"
+        title="Must be exactly 11 digits" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="01234567899">
+      <label for="city">City</label>
+      <select id="city" name="city">
+        <option value="Dhaka">Dhaka</option>
+        <option value="">Select City</option>
+        <option value="Barishal">Barishal</option>
+        <option value="Chattogram">Chattogram</option>
+        <option value="Dhaka">Dhaka</option>
+        <option value="Khulna">Khulna</option>
+        <option value="Rajshahi">Rajshahi</option>
+        <option value="Rangpur">Rangpur</option>
+        <option value="Mymensingh">Mymensingh</option>
+        <option value="Sylhet">Sylhet</option>
+      </select>
+      <label for="ward">Ward</label>
+      <input type="text" id="ward" name="ward" pattern="\d{1,3}" maxlength="3" title="Must be 1 to 3 digits"
+        oninput="this.value=this.value.replace(/[^0-9]/g,'');" value=3>
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" value="1234ab">
+      <button type="submit" onclick="startVideo()" class="btn">Login</button>
+      <div class="register-link">
+        <p>Don't have an account? <a href="register.html">Register here</a></p>
+      </div>
+    </form>
+    <div id="face-verification">
+      <video id="video" autoplay width="320" height="240" muted></video>
+      <canvas id="canvas"></canvas>
+    </div>
+  </div>
+
+  <script>
+    // import * as faceapi from 'https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/+esm'
+    async function loadFaceAPI() {
+      try {
+        await faceapi.nets.tinyFaceDetector.loadFromUri('./models'),
+          await faceapi.nets.faceLandmark68Net.loadFromUri('./models'),
+          await faceapi.nets.faceRecognitionNet.loadFromUri('./models'),
+          await faceapi.nets.ssdMobilenetv1.loadFromUri('./models');
+
+        console.log("FaceAPI models loaded successfully.");
+      } catch (error) {
+        console.error("Error loading FaceAPI models:", error);
+        // alert("Failed to load face detection models. Please reload the page.");
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      await loadFaceAPI();
+      console.log("FaceAPI is ready to use!");
+    });
+
+    async function login(event) {
+      event.preventDefault();
+      const nid_no = document.getElementById('nid_no').value.trim();
+      const phone_number = document.getElementById('phone_number').value.trim();
+      const city = document.getElementById('city').value;
+      const ward = document.getElementById('ward').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      const loader = document.querySelector('.loader');
+      loader.style.display = 'block';
+
+      const user = { nid_no, phone_number, city, ward, password };
+
+      fetch('http://localhost:3000/user_check', {
         method: 'POST',
         headers: {
-            'Accept': 'application/json, text/plain, */*',
-            'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer YOUR_ACCESS_TOKEN'
         },
         body: JSON.stringify(user)
-    })
-    .then(res => res.json())
-    .then(res => {
-        loader.style.display = 'none';
-
-        if (res.vote_status === 1) {
-            if (res.result_published) {
-                window.localStorage.setItem('nid_no', nid_no);
-            window.localStorage.setItem('user', JSON.stringify(res.user));
-            window.localStorage.setItem('city', city);
-            window.localStorage.setItem('ward', ward);
-                window.location.href = './result.html';
-            } else {
-                alert('User has already voted, but result is not published.');
-            }
-        } else if (res.message === "Login successful") {
+      })
+        .then(res => res.json())
+        .then(res => {
+          loader.style.display = 'none';
+          if (res.vote_status === 0) {
             window.localStorage.setItem('nid_no', nid_no);
             window.localStorage.setItem('user', JSON.stringify(res.user));
             window.localStorage.setItem('city', city);
             window.localStorage.setItem('ward', ward);
+            document.getElementById('face-verification').style.display = 'block';
+            startVideo();
+          } else if (res.vote_status === 1 && res.result_published) {
+            window.localStorage.setItem('nid_no', nid_no);
+            window.localStorage.setItem('user', JSON.stringify(res.user));
+            window.localStorage.setItem('city', city);
+            window.localStorage.setItem('ward', ward); window.location.href = './result.html';
+          } else {
+            alert('User has already voted, but result is not published.');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          loader.style.display = 'none';
+          alert('An error occurred while processing your request.');
+        });
+    }
 
-            window.location.href = './dashboard.html';
-        } else {
-            alert(res.error || 'Unknown error occurred.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        loader.style.display = 'none';
-        alert('An error occurred while processing your request.');
-    });
-}
+    async function fetchImageById(id) {
+      const imagePath = `../backend/uploads/${id}.jpg`;
+      return await faceapi.fetchImage(imagePath);
+    }
 
+    async function startVideo() {
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
+      const context = canvas.getContext('2d');
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      video.srcObject = stream;
 
-    </script>
-    
+      video.onloadedmetadata = () => {
+        video.play();
+        detectFaces();
+      };
 
+      // Load labeled face descriptor
+      const img = await fetchImageById(localStorage.getItem('nid_no'));
+      const detection = await faceapi.detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+      const labeledFaceDescriptor = new faceapi.LabeledFaceDescriptors('user', [detection.descriptor]);
+      const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptor, 0.5);
+      console.log("FaceMatcher ready", faceMatcher)
+
+      // Resize canvas to match video
+      canvas.width = video.width;
+      canvas.height = video.height;
+      const displaySize = { width: video.width, height: video.height };
+      faceapi.matchDimensions(canvas, displaySize);
+
+      async function detectFaces() {
+        console.log("detect face called")
+        video.addEventListener('play', () => {
+          const interval = setInterval(async () => {
+            console.log("detecting")
+
+            const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+              .withFaceLandmarks()
+              .withFaceDescriptors();
+
+            // If faces are detected, match them against the labeled descriptor
+            if (detections.length > 0) {
+              const resizedDetections = faceapi.resizeResults(detections, displaySize);
+              print(resizedDetections)
+              context.clearRect(0, 0, canvas.width, canvas.height);
+
+              // Draw detections (bounding boxes) and landmarks
+              faceapi.draw.drawDetections(canvas, resizedDetections);
+              faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+
+              // Match the detected faces against the labeled descriptors
+              resizedDetections.forEach(detection => {
+                const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
+                console.log('Best Match: ', bestMatch);
+                if (bestMatch.distance < 0.6) {
+                  clearInterval(interval);
+                  console.log(bestMatch)
+                  window.location.href = './dashboard.html';
+                }
+              });
+
+            }
+          }, 1000); // Detect every 1000ms
+        });
+      }
+    }
+  </script>
 </body>
+
 </html>
