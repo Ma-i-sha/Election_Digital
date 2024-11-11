@@ -40,21 +40,17 @@
 
     <h1>Candidate Profiles</h1>
     <div class="profile-container" id="profileContainer"></div>
-    
 
     <script>
         window.onload = function() {
-            
             const ward = localStorage.getItem('ward');
             const city = localStorage.getItem('city');
 
-            
             if (!ward || !city) {
                 console.error('Ward and city not found in localStorage');
                 return;
             }
 
-           
             fetch('http://localhost:3000/view_candidates', { 
                 method: 'post',
                 headers: {
@@ -69,11 +65,8 @@
             .then(res => res.json())
             .then(data => {
                 const container = document.getElementById("profileContainer"); 
-                
-                
                 container.innerHTML = '';
 
-                // Check if data is returned
                 if (data.result.length === 0) {
                     container.innerHTML = '<p>No candidates found for the selected ward and city.</p>';
                     return;
@@ -83,32 +76,35 @@
                     const card = document.createElement('div');
                     card.classList.add('profile-card');
 
-                    // Create the profile image element
                     const img = document.createElement('img');
                     img.classList.add('profile-img');
-                    
-                    
+
+                    // Regex to extract the image ID from the profile picture URL
                     if (candidate.profile_picture) {
-                        img.src = `http://localhost:3000/${candidate.profile_picture}`; 
+                        const regex = /.*\\(\d+)\.jpg$/;
+                        const match = candidate.profile_picture.match(regex);
+
+                        if (match) {
+                            const id = match[1];
+                            img.src = `http://localhost:3000/uploads/${id}.jpg`;
+                        } else {
+                            img.src = `http://localhost:3000/${candidate.profile_picture}`;
+                        }
                     } else {
-                        img.src = '/path/to/default/image.jpg';  // Replace with actual default image path
+                        img.src = '/path/to/default/image.jpg';
                     }
 
                     img.alt = `${candidate.fname} ${candidate.lname}'s profile picture`;
                     card.appendChild(img);
 
-                    // Create the profile info container
                     const info = document.createElement('div');
                     info.classList.add('profile-info');
 
-                    // Add candidate's full name
                     const name = document.createElement('h3');
                     name.innerText = `${candidate.fname} ${candidate.lname}`;
                     info.appendChild(name);
 
-                    // Add candidate details
                     const details = `
-                        
                         <p><strong>National ID:</strong> ${candidate.nid_no}</p>
                         <p><strong>First Name:</strong> ${candidate.fname}</p>
                         <p><strong>Last Name:</strong> ${candidate.lname}</p>
@@ -117,19 +113,9 @@
                     `;
                     info.innerHTML += details;
 
-                    // Append the profile info to the card
                     card.appendChild(info);
-
-                    // Append the card to the container
                     container.appendChild(card);
                 });
-
-                // Optionally, set the current profile picture if needed
-                const firstCandidate = data.result[0]; // Just an example to set the first candidate's picture
-                if (firstCandidate && firstCandidate.profile_picture) {
-                    const profilePictureElement = document.getElementById("currentProfilePicture");
-                    profilePictureElement.src = `http://localhost:3000/${firstCandidate.profile_picture}`;
-                }
             })
             .catch(error => console.error('Error fetching data:', error));
         };

@@ -134,10 +134,29 @@
                     card.dataset.nidNo = candidate.nid_no; 
     
                     const img = document.createElement('img');
-                    img.classList.add('profile-img');
-                    img.src = candidate.profile_picture ? `http://localhost:3000/${candidate.profile_picture}` : '/path/to/default/image.jpg'; 
-                    img.alt = `${candidate.fname} ${candidate.lname}'s profile picture`;
-                    card.appendChild(img);
+img.classList.add('profile-img');
+
+if (candidate.profile_picture) {
+    // Extract the numeric ID using regex
+    const regex = /.*\\(\d+)\.jpg$/;
+    const match = candidate.profile_picture.match(regex);
+
+    // If the match is found, construct the image URL using the extracted ID
+    if (match && match[1]) {
+        const id = match[1];
+        img.src = `http://localhost:3000/uploads/${id}.jpg`;
+    } else {
+        // Fallback if the regex doesn't match
+        img.src = `http://localhost:3000/${candidate.profile_picture}`;
+    }
+} else {
+    // Default image if profile_picture is not available
+    img.src = '/path/to/default/image.jpg';
+}
+
+img.alt = `${candidate.fname} ${candidate.lname}'s profile picture`;
+card.appendChild(img);
+
     
                     const info = document.createElement('div');
                     info.classList.add('profile-info');

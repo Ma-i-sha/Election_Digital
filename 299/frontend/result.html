@@ -27,15 +27,15 @@
             font-size: 16px;
         }
         .chart-container {
-            width: 800px; /* Fixed width for chart container */
-            height: 400px; /* Fixed height for chart container */
+            width: 800px;
+            height: 400px;
             margin-bottom: 30px;
         }
         canvas {
             background-color: white;
             border-radius: 8px;
-            height: 100%; /* Full height of the container */
-            width: 100%; /* Full width of the container */
+            height: 100%;
+            width: 100%;
         }
     </style>
 </head>
@@ -44,100 +44,97 @@
         <button onclick="logout()">Logout</button>
     </div>
 
-    <div id="charts-container"></div>
-    
+    <div id="chart-container"></div>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <script>
-      async function fetchWardData() {
-          try {
-              const response = await fetch(`http://localhost:3000/candidateinfos`);
-              const data = await response.json();
-  
-              // Log the entire data to understand its structure
-              console.log('Data received from backend:', data);
-  
-              if (!data || Object.keys(data).length === 0) {
-                  console.log('No data found for any ward.');
-                  return;
-              }
-  
-              // Generate a chart for each ward
-              Object.entries(data).forEach(([wardId, candidates]) => {
-                  // Ensure that candidates is an array before proceeding
-                  if (Array.isArray(candidates)) {
-                      createChart(wardId, candidates);
-                  } else {
-                      console.error(`Data for ward ${wardId} is not an array:`, candidates);
-                  }
-              });
-          } catch (error) {
-              console.error('Error fetching data:', error);
-          }
-      }
-  
-      function createChart(wardId, candidates) {
-          const chartContainer = document.createElement('div');
-          chartContainer.classList.add('chart-container');
-          chartContainer.innerHTML = `<h3>Ward ${wardId}</h3>`;
-          
-          const canvas = document.createElement('canvas');
-          chartContainer.appendChild(canvas);
-          document.getElementById('charts-container').appendChild(chartContainer);
-  
-          const candidateNames = candidates.map(candidate => `${candidate.fname} ${candidate.lname}`);
-          const voteCounts = candidates.map(candidate => candidate.vote_count);
-  
-          new Chart(canvas.getContext('2d'), {
-              type: 'bar',
-              data: {
-                  labels: candidateNames,
-                  datasets: [{
-                      label: 'Vote Count',
-                      data: voteCounts,
-                      backgroundColor: ['#ff0000', '#008000', '#0000ff', '#ffa500', '#8b0000'],
-                      borderColor: '#000000',
-                      borderWidth: 1,
-                  }]
-              },
-              options: {
-                  scales: {
-                      y: {
-                          beginAtZero: true,
-                          title: {
-                              display: true,
-                              text: 'VOTE COUNT',
-                              color: '#000',
-                              font: {
-                                  size: 16,
-                                  weight: 'bold'
-                              }
-                          }
-                      },
-                      x: {
-                          title: {
-                              display: true,
-                              text: 'CANDIDATES',
-                              color: '#000',
-                              font: {
-                                  size: 16,
-                                  weight: 'bold'
-                              }
-                          }
-                      }
-                  }
-              }
-          });
-      }
-  
-      function logout() {
-          localStorage.clear();
-          window.location.href = 'home_page.html';
-      }
-  
-      // Fetch ward data on load
-      fetchWardData();
-  </script>
-  
+        const wardId = localStorage.getItem('ward'); // Get ward_id from localStorage
+
+        // Function to fetch candidate data for a single ward
+        async function fetchCandidateData() {
+            try {
+                const response = await fetch(`http://localhost:3000/candidateinfo?ward_id=${wardId}`);
+                const data = await response.json();
+
+                // Log data for debugging
+                console.log('Data received from backend:', data);
+
+                if (!data || data.length === 0) {
+                    console.log('No candidates found for this ward.');
+                    return;
+                }
+
+                // Create chart with the received candidate data
+                createChart(data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Function to create a chart for the ward
+        function createChart(candidates) {
+            const chartContainer = document.createElement('div');
+            chartContainer.classList.add('chart-container');
+
+            const canvas = document.createElement('canvas');
+            chartContainer.appendChild(canvas);
+            document.getElementById('chart-container').appendChild(chartContainer);
+
+            const candidateNames = candidates.map(candidate => `${candidate.fname} ${candidate.lname}`);
+            const voteCounts = candidates.map(candidate => candidate.vote_count);
+
+            new Chart(canvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: candidateNames,
+                    datasets: [{
+                        label: 'Vote Count',
+                        data: voteCounts,
+                        backgroundColor: ['#ff0000', '#008000', '#0000ff', '#ffa500', '#8b0000'],
+                        borderColor: '#000000',
+                        borderWidth: 1,
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'VOTE COUNT',
+                                color: '#000',
+                                font: {
+                                    size: 16,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'CANDIDATES',
+                                color: '#000',
+                                font: {
+                                    size: 16,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'home_page.html';
+        }
+
+        // Fetch candidate data on page load
+        fetchCandidateData();
+    </script>
+
 </body>
 </html>

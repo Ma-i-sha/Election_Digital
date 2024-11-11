@@ -399,6 +399,7 @@ input[disabled] {
                     return response.json();
                 })
                 .then(data => {
+                    console.log(data);
                     if (data.result) {
                         const userData = data.result;
 
@@ -420,9 +421,14 @@ input[disabled] {
                         document.getElementById('country').value = userData.country || '';
 
                         // Set the profile picture
+                        
                         const profilePictureElement = document.getElementById("currentProfilePicture");
                         if (userData.profile_picture) {
-                            profilePictureElement.src = `http://localhost:3000/${userData.profile_picture}`;
+                            const regex = /.*\\(\d+)\.jpg$/;
+                            const match = userData.profile_picture.match(regex);
+                               const id=match[1];
+                               console.log(id);
+                            profilePictureElement.src = `http://localhost:3000/uploads/${id}.jpg`;
                         } else {
                             profilePictureElement.src = '/path/to/default/image.jpg';  
                         }

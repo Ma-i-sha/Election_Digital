@@ -125,10 +125,10 @@
     <h2>Voter Login</h2>
     <form onsubmit="login(event)">
       <label for="nid_no">NID No</label>
-      <input type="text" id="nid_no" name="nid_no" pattern="\d{10}" maxlength="10" title="Must be exactly 10 digits"
+      <input required type="text" id="nid_no" name="nid_no" pattern="\d{10}" maxlength="10" title="Must be exactly 10 digits"
         oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="2111920642">
       <label for="phone_number">Phone Number</label>
-      <input type="text" id="phone_number" name="phone_number" pattern="\d{11}" maxlength="11"
+      <input required type="text" id="phone_number" name="phone_number" pattern="\d{11}" maxlength="11"
         title="Must be exactly 11 digits" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="01234567899">
       <label for="city">City</label>
       <select id="city" name="city">
@@ -144,10 +144,10 @@
         <option value="Sylhet">Sylhet</option>
       </select>
       <label for="ward">Ward</label>
-      <input type="text" id="ward" name="ward" pattern="\d{1,3}" maxlength="3" title="Must be 1 to 3 digits"
+      <input required type="text" id="ward" name="ward" pattern="\d{1,3}" maxlength="3" title="Must be 1 to 3 digits"
         oninput="this.value=this.value.replace(/[^0-9]/g,'');" value=3>
       <label for="password">Password</label>
-      <input type="password" id="password" name="password" value="1234ab">
+      <input required type="password" id="password" name="password" value="1234ab">
       <button type="submit" onclick="startVideo()" class="btn">Login</button>
       <div class="register-link">
         <p>Don't have an account? <a href="register.html">Register here</a></p>
@@ -207,10 +207,12 @@
         .then(res => res.json())
         .then(res => {
           loader.style.display = 'none';
+          console.log(res);
           if (res.vote_status === 0) {
+          
             imagepath=res.user.profile_picture;
             console.log(imagepath);
-            const regex = /\\(\d+)\.jpg$/;
+            const regex = /.*\\(\d+)\.jpg$/;
             const match = imagepath.match(regex);
             imagepath=match[1];
             console.log(match);
@@ -237,7 +239,7 @@
     }
 
     async function fetchImageById(id) {
-      const imagePath = `../backend/uploads/${id}.jpg`;
+      const imagePath = `http://localhost:3000/uploads/${id}.jpg`;
       try{
         const img=await faceapi.fetchImage(imagePath);
         return img;
