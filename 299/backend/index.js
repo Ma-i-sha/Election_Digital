@@ -39,7 +39,7 @@ if (!fs.existsSync(uploadDir)) {
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads'); // Save files to the 'uploads' folder
+        cb(null,uploadDir ); // Save files to the 'uploads' folder
     },
     filename: function (req, file, cb) {
         cb(null, Date.now() + path.extname(file.originalname)); // Use a timestamp for unique filename
@@ -73,10 +73,10 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Serve uploaded files
+console.log(__dirname);
 
 
 // Registration route
-app.use('/uploads', express.static('uploads'));
 
 
 app.post('/add_voter', upload.single('profile_picture'), (req, res) => {
@@ -108,6 +108,7 @@ app.post('/add_voter', upload.single('profile_picture'), (req, res) => {
 
   let profile_picture;
   if (req.file) {
+    console.log(req.file);
     profile_picture = req.file.path;
   } else {
     return res.status(400).json({ error: 'Please upload a profile picture.' });
